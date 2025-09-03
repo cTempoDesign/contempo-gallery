@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { GalleryProps } from './types';
-import { Lightbox } from './Lightbox';
-import './Gallery.css';
+import { ContempoGalleryProps } from './types';
+import { ContempoLightbox } from './ContempoLightbox';
+import './ContempoGallery.css';
 
-export const Gallery: React.FC<GalleryProps> = ({
+export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
   images,
   columns = 3,
   gap = 8,
@@ -82,7 +82,7 @@ export const Gallery: React.FC<GalleryProps> = ({
       </div>
 
       {showLightbox && (
-        <Lightbox
+        <ContempoLightbox
           images={images}
           currentIndex={currentIndex}
           isOpen={lightboxOpen}

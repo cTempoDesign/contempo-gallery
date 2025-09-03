@@ -22,7 +22,7 @@ npm install contempo-gallery
 
 ```tsx
 import React from 'react';
-import { Gallery } from 'contempo-gallery';
+import { ContempoGallery } from 'contempo-gallery';
 
 const images = [
   {
@@ -45,7 +45,7 @@ function App() {
   return (
     <div>
       <h1>My Photo Gallery</h1>
-      <Gallery images={images} columns={3} gap={12} />
+      <ContempoGallery images={images} columns={3} gap={12} />
     </div>
   );
 }
@@ -57,18 +57,18 @@ function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `images` | `GalleryImage[]` | required | Array of images to display |
+| `images` | `ContempoGalleryImage[]` | required | Array of images to display |
 | `columns` | `number` | `3` | Number of columns in the grid |
 | `gap` | `number` | `8` | Gap between images in pixels |
 | `className` | `string` | `''` | Additional CSS class for the gallery |
-| `onImageClick` | `(index: number, image: GalleryImage) => void` | - | Callback when an image is clicked |
+| `onImageClick` | `(index: number, image: ContempoGalleryImage) => void` | - | Callback when an image is clicked |
 | `showLightbox` | `boolean` | `true` | Whether to show the lightbox on image click |
 | `lightboxClassName` | `string` | `''` | Additional CSS class for the lightbox |
 
-### GalleryImage Interface
+### ContempoGalleryImage Interface
 
 ```tsx
-interface GalleryImage {
+interface ContempoGalleryImage {
   src: string;           // Main image URL
   alt?: string;          // Alt text for accessibility
   caption?: string;      // Optional caption text
@@ -81,16 +81,16 @@ interface GalleryImage {
 ### Custom Click Handler
 
 ```tsx
-import { Gallery, GalleryImage } from 'contempo-gallery';
+import { ContempoGallery, ContempoGalleryImage } from 'contempo-gallery';
 
 function CustomGallery() {
-  const handleImageClick = (index: number, image: GalleryImage) => {
+  const handleImageClick = (index: number, image: ContempoGalleryImage) => {
     console.log(`Clicked image ${index}:`, image);
     // Custom logic here
   };
 
   return (
-    <Gallery 
+    <ContempoGallery 
       images={images}
       onImageClick={handleImageClick}
       showLightbox={false} // Disable built-in lightbox
@@ -107,7 +107,7 @@ function CustomGallery() {
 // - Tablet (≤768px): Max 2 columns
 // - Mobile (≤480px): Single column
 
-<Gallery 
+<ContempoGallery 
   images={images}
   columns={4} // Will show 4 on desktop, 2 on tablet, 1 on mobile
 />
@@ -219,7 +219,7 @@ npm run typecheck
 Fully typed with TypeScript. All props and interfaces are exported:
 
 ```tsx
-import { Gallery, GalleryProps, GalleryImage } from 'contempo-gallery';
+import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from 'contempo-gallery';
 ```
 
 ## License

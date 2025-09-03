@@ -1,8 +1,8 @@
 import React from 'react';
-import { Gallery, GalleryImage } from 'contempo-gallery';
+import { ContempoGallery, ContempoGalleryImage } from 'contempo-gallery';
 
 // Sample images for demonstration
-const sampleImages: GalleryImage[] = [
+const sampleImages: ContempoGalleryImage[] = [
   {
     src: 'https://picsum.photos/800/600?random=1',
     alt: 'Random image 1',
@@ -48,7 +48,7 @@ const sampleImages: GalleryImage[] = [
 ];
 
 export default function App() {
-  const handleImageClick = (index: number, image: GalleryImage) => {
+  const handleImageClick = (index: number, image: ContempoGalleryImage) => {
     console.log(`Clicked image ${index}:`, image);
   };
 
@@ -58,7 +58,7 @@ export default function App() {
       
       <section style={{ marginBottom: '40px' }}>
         <h2>Basic Gallery (3 columns)</h2>
-        <Gallery 
+        <ContempoGallery 
           images={sampleImages}
           columns={3}
           gap={16}
@@ -68,7 +68,7 @@ export default function App() {
 
       <section style={{ marginBottom: '40px' }}>
         <h2>4 Column Gallery</h2>
-        <Gallery 
+        <ContempoGallery 
           images={sampleImages.slice(0, 8)}
           columns={4}
           gap={12}
@@ -77,7 +77,7 @@ export default function App() {
 
       <section style={{ marginBottom: '40px' }}>
         <h2>2 Column Gallery with Larger Gap</h2>
-        <Gallery 
+        <ContempoGallery 
           images={sampleImages.slice(0, 6)}
           columns={2}
           gap={24}
@@ -86,7 +86,7 @@ export default function App() {
 
       <section>
         <h2>Gallery without Lightbox</h2>
-        <Gallery 
+        <ContempoGallery 
           images={sampleImages.slice(0, 4)}
           columns={2}
           gap={16}

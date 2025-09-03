@@ -1,3 +1,3 @@
-export { Gallery } from './Gallery';
-export { Lightbox } from './Lightbox';
-export type { GalleryProps, GalleryImage, LightboxProps } from './types';
+export { ContempoGallery } from './ContempoGallery';
+export { ContempoLightbox } from './ContempoLightbox';
+export type { ContempoGalleryProps, ContempoGalleryImage, ContempoLightboxProps } from './types';

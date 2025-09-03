@@ -1,22 +1,22 @@
-export interface GalleryImage {
+export interface ContempoGalleryImage {
   src: string;
   alt?: string;
   caption?: string;
   thumbnail?: string;
 }
 
-export interface GalleryProps {
-  images: GalleryImage[];
+export interface ContempoGalleryProps {
+  images: ContempoGalleryImage[];
   columns?: number;
   gap?: number;
   className?: string;
-  onImageClick?: (index: number, image: GalleryImage) => void;
+  onImageClick?: (index: number, image: ContempoGalleryImage) => void;
   showLightbox?: boolean;
   lightboxClassName?: string;
 }
 
-export interface LightboxProps {
-  images: GalleryImage[];
+export interface ContempoLightboxProps {
+  images: ContempoGalleryImage[];
   currentIndex: number;
   isOpen: boolean;
   onClose: () => void;
