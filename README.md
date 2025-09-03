@@ -169,6 +169,51 @@ The gallery comes with built-in responsive styles, but you can customize it:
 - IE 11+ (with polyfills)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
+## Development & Examples
+
+### Running the Local Showcase
+
+To see the gallery in action and test different configurations:
+
+```bash
+# Clone or navigate to the project
+cd contempo-gallery/example
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The showcase will be available at `http://localhost:5173/` and includes:
+
+- **Basic 3-column gallery** with sample images
+- **4-column gallery** variant  
+- **2-column gallery** with larger gaps
+- **Gallery without lightbox** (custom click handler demo)
+- **Responsive behavior** testing
+
+### Development Features
+
+- **Hot reload** - Changes to components auto-refresh
+- **TypeScript support** - Full type checking
+- **Responsive testing** - Resize browser to test breakpoints
+- **Accessibility testing** - Use keyboard navigation and screen readers
+
+### Building the Package
+
+```bash
+# Build for distribution
+npm run build
+
+# Run linting
+npm run lint
+
+# Type checking
+npm run typecheck
+```
+
 ## TypeScript
 
 Fully typed with TypeScript. All props and interfaces are exported:
