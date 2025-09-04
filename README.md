@@ -2,6 +2,10 @@
 
 A dynamic responsive React image gallery component with lightbox functionality, built with TypeScript and designed for accessibility.
 
+## 🌟 [Live Demo](https://contempo-gallery-showcase.vercel.app/)
+
+See the gallery in action with multiple configurations and examples.
+
 ## Features
 
 - 🖼️ **Responsive Grid Layout**: Automatically adjusts columns based on screen size
