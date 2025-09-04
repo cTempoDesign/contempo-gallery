@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContempoGallery } from '../ContempoGallery';
 import { ContempoGalleryImage } from '../types';
@@ -77,7 +77,10 @@ describe('ContempoGallery', () => {
     render(<ContempoGallery images={mockImages} />);
     
     const firstImage = screen.getByAltText('Test image 1');
-    await user.click(firstImage);
+    
+    await act(async () => {
+      await user.click(firstImage);
+    });
     
     // Check if lightbox is rendered
     await waitFor(() => {
@@ -92,7 +95,10 @@ describe('ContempoGallery', () => {
     render(<ContempoGallery images={mockImages} onImageClick={mockOnImageClick} />);
     
     const secondImage = screen.getByAltText('Test image 2');
-    await user.click(secondImage);
+    
+    await act(async () => {
+      await user.click(secondImage);
+    });
     
     expect(mockOnImageClick).toHaveBeenCalledWith(1, mockImages[1]);
   });
@@ -102,7 +108,10 @@ describe('ContempoGallery', () => {
     render(<ContempoGallery images={mockImages} showLightbox={false} />);
     
     const firstImage = screen.getByAltText('Test image 1');
-    await user.click(firstImage);
+    
+    await act(async () => {
+      await user.click(firstImage);
+    });
     
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
@@ -115,11 +124,15 @@ describe('ContempoGallery', () => {
     const firstItem = galleryItems[0];
     
     // Focus the first item
-    firstItem.focus();
+    act(() => {
+      firstItem.focus();
+    });
     expect(firstItem).toHaveFocus();
     
     // Press Enter to open lightbox
-    await user.keyboard('{Enter}');
+    await act(async () => {
+      await user.keyboard('{Enter}');
+    });
     
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -133,8 +146,13 @@ describe('ContempoGallery', () => {
     const galleryItems = screen.getAllByRole('gridcell');
     const firstItem = galleryItems[0];
     
-    firstItem.focus();
-    await user.keyboard(' ');
+    act(() => {
+      firstItem.focus();
+    });
+    
+    await act(async () => {
+      await user.keyboard(' ');
+    });
     
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -177,7 +195,10 @@ describe('ContempoGallery', () => {
     render(<ContempoGallery images={mockImages} lightboxClassName="custom-lightbox" />);
     
     const firstImage = screen.getByAltText('Test image 1');
-    await user.click(firstImage);
+    
+    await act(async () => {
+      await user.click(firstImage);
+    });
     
     await waitFor(() => {
       const lightbox = screen.getByRole('dialog');
@@ -191,7 +212,10 @@ describe('ContempoGallery', () => {
     
     // Open lightbox
     const firstImage = screen.getByAltText('Test image 1');
-    await user.click(firstImage);
+    
+    await act(async () => {
+      await user.click(firstImage);
+    });
     
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -199,7 +223,10 @@ describe('ContempoGallery', () => {
     
     // Close lightbox
     const closeButton = screen.getByLabelText('Close lightbox');
-    await user.click(closeButton);
+    
+    await act(async () => {
+      await user.click(closeButton);
+    });
     
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -212,7 +239,10 @@ describe('ContempoGallery', () => {
     
     // Open lightbox with first image
     const firstImage = screen.getByAltText('Test image 1');
-    await user.click(firstImage);
+    
+    await act(async () => {
+      await user.click(firstImage);
+    });
     
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -224,7 +254,10 @@ describe('ContempoGallery', () => {
     
     // Click next button
     const nextButton = screen.getByLabelText('Next image');
-    await user.click(nextButton);
+    
+    await act(async () => {
+      await user.click(nextButton);
+    });
     
     // Check second image is displayed
     await waitFor(() => {
@@ -239,7 +272,10 @@ describe('ContempoGallery', () => {
     
     // Open lightbox with last image
     const lastImage = screen.getByAltText('Test image 3');
-    await user.click(lastImage);
+    
+    await act(async () => {
+      await user.click(lastImage);
+    });
     
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -247,7 +283,10 @@ describe('ContempoGallery', () => {
     
     // Click next to wrap to first image
     const nextButton = screen.getByLabelText('Next image');
-    await user.click(nextButton);
+    
+    await act(async () => {
+      await user.click(nextButton);
+    });
     
     await waitFor(() => {
       const lightboxImage = screen.getByRole('dialog').querySelector('img');

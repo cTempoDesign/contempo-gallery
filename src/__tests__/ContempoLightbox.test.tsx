@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContempoLightbox } from '../ContempoLightbox';
 import { ContempoGalleryImage } from '../types';
@@ -101,7 +101,10 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} onClose={mockOnClose} />);
     
     const closeButton = screen.getByLabelText('Close lightbox');
-    await user.click(closeButton);
+    
+    await act(async () => {
+      await user.click(closeButton);
+    });
     
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
@@ -113,7 +116,10 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} onClose={mockOnClose} />);
     
     const dialog = screen.getByRole('dialog');
-    await user.click(dialog);
+    
+    await act(async () => {
+      await user.click(dialog);
+    });
     
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
@@ -125,7 +131,10 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} onClose={mockOnClose} />);
     
     const image = screen.getByAltText('Test image 1');
-    await user.click(image);
+    
+    await act(async () => {
+      await user.click(image);
+    });
     
     expect(mockOnClose).not.toHaveBeenCalled();
   });
@@ -152,7 +161,10 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} onNext={mockOnNext} />);
     
     const nextButton = screen.getByLabelText('Next image');
-    await user.click(nextButton);
+    
+    await act(async () => {
+      await user.click(nextButton);
+    });
     
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });
@@ -164,7 +176,10 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} onPrev={mockOnPrev} />);
     
     const prevButton = screen.getByLabelText('Previous image');
-    await user.click(prevButton);
+    
+    await act(async () => {
+      await user.click(prevButton);
+    });
     
     expect(mockOnPrev).toHaveBeenCalledTimes(1);
   });
@@ -173,7 +188,9 @@ describe('ContempoLightbox', () => {
     const mockOnClose = jest.fn();
     render(<ContempoLightbox {...defaultProps} onClose={mockOnClose} />);
     
-    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
     
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
@@ -182,7 +199,9 @@ describe('ContempoLightbox', () => {
     const mockOnNext = jest.fn();
     render(<ContempoLightbox {...defaultProps} onNext={mockOnNext} />);
     
-    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    act(() => {
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+    });
     
     expect(mockOnNext).toHaveBeenCalledTimes(1);
   });
@@ -191,7 +210,9 @@ describe('ContempoLightbox', () => {
     const mockOnPrev = jest.fn();
     render(<ContempoLightbox {...defaultProps} onPrev={mockOnPrev} />);
     
-    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    act(() => {
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    });
     
     expect(mockOnPrev).toHaveBeenCalledTimes(1);
   });
@@ -211,9 +232,11 @@ describe('ContempoLightbox', () => {
       />
     );
     
-    fireEvent.keyDown(document, { key: 'Escape' });
-    fireEvent.keyDown(document, { key: 'ArrowRight' });
-    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    });
     
     expect(mockOnClose).not.toHaveBeenCalled();
     expect(mockOnNext).not.toHaveBeenCalled();
