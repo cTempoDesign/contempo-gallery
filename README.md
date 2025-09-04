@@ -170,6 +170,75 @@ The gallery comes with built-in responsive styles, but you can customize it:
 - IE 11+ (with polyfills)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
+## Testing
+
+This package includes comprehensive unit tests with high coverage requirements.
+
+### Running Tests
+
+```bash
+# Run all tests once
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Coverage
+
+The test suite maintains high coverage standards:
+- **Branches**: 90%
+- **Functions**: 90% 
+- **Lines**: 90%
+- **Statements**: 90%
+
+Coverage reports are generated in the `coverage/` directory and include:
+- Terminal summary
+- HTML report (`coverage/lcov-report/index.html`)
+- LCOV format for CI integration
+
+### Test Structure
+
+Tests are organized in `src/__tests__/`:
+- `ContempoGallery.test.tsx` - Gallery component tests
+- `ContempoLightbox.test.tsx` - Lightbox component tests  
+- `types.test.ts` - Type definition tests
+
+### What's Tested
+
+**ContempoGallery Component:**
+- Rendering with various props
+- Image display and thumbnails
+- Responsive grid behavior
+- Lightbox integration
+- Keyboard navigation
+- Accessibility features
+- Click handlers and callbacks
+
+**ContempoLightbox Component:**
+- Modal display and hiding
+- Image navigation (next/prev)
+- Keyboard shortcuts (ESC, arrows)
+- Focus management
+- Body scroll locking
+- Touch/click handling
+- Screen reader support
+
+**Types:**
+- Interface completeness
+- Optional properties
+- Callback signatures
+
+### Continuous Integration
+
+Tests run automatically on:
+- Pull requests
+- Builds
+- Deployments (Vercel)
+
 ## Development & Examples
 
 ### Running the Local Showcase
