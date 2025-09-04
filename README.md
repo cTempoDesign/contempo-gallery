@@ -23,6 +23,7 @@ npm install contempo-gallery
 ```tsx
 import React from 'react';
 import { ContempoGallery } from 'contempo-gallery';
+// CSS styles are automatically imported, no need to import manually
 
 const images = [
   {
@@ -224,7 +225,7 @@ import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from 'con
 
 ## License
 
-MIT © [Your Name]
+MIT © Contempo Web Design
 
 ## Contributing
 

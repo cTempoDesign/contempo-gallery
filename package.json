@@ -1,6 +1,6 @@
 {
   "name": "contempo-gallery",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A dynamic responsive React image gallery component with lightbox functionality",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -15,7 +15,8 @@
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "pack": "npm pack --pack-destination=dist"
   },
   "keywords": [
     "react",
@@ -26,7 +27,7 @@
     "photo",
     "component"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Contempo Web Design, ContempoWebDesign@gmail.com",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -55,10 +56,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/contempo-gallery.git"
+    "url": "https://github.com/cTempoDesign/contempo-gallery.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/contempo-gallery/issues"
+    "url": "https://github.com/cTempoDesign/contempo-gallery/issues"
   },
-  "homepage": "https://github.com/yourusername/contempo-gallery#readme"
+  "homepage": "https://github.com/cTempoDesign/contempo-gallery#readme"
 }

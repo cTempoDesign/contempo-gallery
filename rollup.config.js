@@ -30,7 +30,8 @@ export default {
       tsconfig: './tsconfig.json'
     }),
     postcss({
-      extract: true,
+      inject: true,
+      extract: false,
       minimize: true
     })
   ]

@@ -32,6 +32,13 @@
   object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
+  /* Reset any inherited styles from parent applications */
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
 }
 
 .contempo-gallery__item:hover .contempo-gallery__image {

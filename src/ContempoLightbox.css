@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 9999;
+  z-index: 999999; /* Higher z-index to ensure it's above other content */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,6 +12,8 @@
   backdrop-filter: blur(4px);
   opacity: 0;
   animation: lightbox-fade-in 0.3s ease forwards;
+  /* Isolate stacking context */
+  isolation: isolate;
 }
 
 @keyframes lightbox-fade-in {
@@ -108,6 +110,14 @@
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  /* Reset any inherited styles from parent applications */
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  display: block;
 }
 
 .contempo-lightbox__caption {
