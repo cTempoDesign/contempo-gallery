@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContempoGallery } from '../contempo-gallery';
-import { ContempoGalleryImage } from '../types';
+import { ContempoGalleryImage, RenderImageProps } from '../types';
 
 const mockImages: ContempoGalleryImage[] = [
   {
@@ -291,6 +291,261 @@ describe('ContempoGallery', () => {
     await waitFor(() => {
       const lightboxImage = screen.getByRole('dialog').querySelector('img');
       expect(lightboxImage).toHaveAttribute('src', 'https://example.com/image1.jpg');
+    });
+  });
+
+  describe('Next.js Image Integration', () => {
+    const MockNextImage = jest.fn(({ src, alt, className, ...props }) => (
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        data-testid="gallery-next-image"
+        data-props={JSON.stringify(props)}
+      />
+    ));
+
+    beforeEach(() => {
+      MockNextImage.mockClear();
+    });
+
+    test('uses Next.js Image when NextImage component and useNextImage are provided', () => {
+      render(
+        <ContempoGallery
+          images={mockImages}
+          NextImage={MockNextImage}
+          useNextImage={true}
+        />
+      );
+
+      const nextImages = screen.getAllByTestId('gallery-next-image');
+      expect(nextImages).toHaveLength(3);
+      expect(MockNextImage).toHaveBeenCalledTimes(3);
+    });
+
+    test('passes Next.js specific props from image data', () => {
+      const imagesWithNextProps: ContempoGalleryImage[] = [
+        {
+          src: 'https://example.com/image1.jpg',
+          alt: 'Test image 1',
+          width: 800,
+          height: 600,
+          quality: 90,
+          priority: true
+        }
+      ];
+
+      render(
+        <ContempoGallery
+          images={imagesWithNextProps}
+          NextImage={MockNextImage}
+          useNextImage={true}
+        />
+      );
+
+      expect(MockNextImage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          src: 'https://example.com/image1.jpg',
+          alt: 'Test image 1',
+          width: 800,
+          height: 600,
+          quality: 90,
+          priority: true
+        }),
+        expect.any(Object)
+      );
+    });
+
+    test('passes nextImageProps to Next.js Image component', () => {
+      const nextImageProps = {
+        sizes: '(max-width: 768px) 100vw, 50vw',
+        placeholder: 'blur' as const
+      };
+
+      render(
+        <ContempoGallery
+          images={mockImages}
+          NextImage={MockNextImage}
+          useNextImage={true}
+          nextImageProps={nextImageProps}
+        />
+      );
+
+      expect(MockNextImage).toHaveBeenCalledWith(
+        expect.objectContaining(nextImageProps),
+        expect.any(Object)
+      );
+    });
+
+    test('falls back to native img when useNextImage is false', () => {
+      render(
+        <ContempoGallery
+          images={mockImages}
+          NextImage={MockNextImage}
+          useNextImage={false}
+        />
+      );
+
+      const nativeImages = screen.getAllByRole('img');
+      expect(nativeImages).toHaveLength(3);
+      expect(MockNextImage).not.toHaveBeenCalled();
+    });
+
+    test('falls back to native img when NextImage is not provided', () => {
+      render(
+        <ContempoGallery
+          images={mockImages}
+          useNextImage={true}
+        />
+      );
+
+      const nativeImages = screen.getAllByRole('img');
+      expect(nativeImages).toHaveLength(3);
+      expect(MockNextImage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Custom renderImage prop', () => {
+    test('uses custom renderImage when provided', () => {
+      const customRenderImage = jest.fn((props: RenderImageProps) => (
+        <div data-testid="custom-image">
+          <span>Custom: {props.image.src}</span>
+        </div>
+      ));
+
+      render(
+        <ContempoGallery
+          images={mockImages}
+          renderImage={customRenderImage}
+        />
+      );
+
+      const customImages = screen.getAllByTestId('custom-image');
+      expect(customImages).toHaveLength(3);
+      expect(customRenderImage).toHaveBeenCalledTimes(3);
+    });
+
+    test('renderImage receives correct props', () => {
+      const customRenderImage = jest.fn((props: RenderImageProps) => (
+        <div data-testid="custom-image" />
+      ));
+
+      render(
+        <ContempoGallery
+          images={mockImages}
+          renderImage={customRenderImage}
+        />
+      );
+
+      expect(customRenderImage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          image: mockImages[0],
+          index: 0,
+          isLightbox: false,
+          className: 'contempo-gallery__image',
+          loading: 'lazy'
+        })
+      );
+    });
+
+    test('renderImage takes precedence over Next.js Image', () => {
+      const MockNextImage = jest.fn(() => <img data-testid="gallery-next-image" />);
+      const customRenderImage = jest.fn((props: RenderImageProps) => (
+        <div data-testid="custom-image" />
+      ));
+
+      render(
+        <ContempoGallery
+          images={mockImages}
+          NextImage={MockNextImage}
+          useNextImage={true}
+          renderImage={customRenderImage}
+        />
+      );
+
+      expect(screen.getAllByTestId('custom-image')).toHaveLength(3);
+      expect(screen.queryByTestId('gallery-next-image')).not.toBeInTheDocument();
+      expect(MockNextImage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Lightbox Next.js Image Integration', () => {
+    const MockNextImage = jest.fn(({ src, alt, className, ...props }) => (
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        data-testid="lightbox-next-image"
+        data-props={JSON.stringify(props)}
+      />
+    ));
+
+    beforeEach(() => {
+      MockNextImage.mockClear();
+    });
+
+    test('lightbox uses Next.js Image when provided', async () => {
+      const user = userEvent.setup();
+      render(
+        <ContempoGallery
+          images={mockImages}
+          NextImage={MockNextImage}
+          useNextImage={true}
+        />
+      );
+
+      const firstImage = screen.getByAltText('Test image 1');
+
+      await act(async () => {
+        await user.click(firstImage);
+      });
+
+      await waitFor(() => {
+        const lightboxDialog = screen.getByRole('dialog');
+        const lightboxImage = lightboxDialog.querySelector('[data-testid="lightbox-next-image"]');
+        expect(lightboxImage).toBeInTheDocument();
+      });
+    });
+
+    test('lightbox passes through Next.js props correctly', async () => {
+      const user = userEvent.setup();
+      const imagesWithNextProps: ContempoGalleryImage[] = [
+        {
+          src: 'https://example.com/image1.jpg',
+          alt: 'Test image 1',
+          width: 1200,
+          height: 800,
+          priority: true
+        }
+      ];
+
+      render(
+        <ContempoGallery
+          images={imagesWithNextProps}
+          NextImage={MockNextImage}
+          useNextImage={true}
+        />
+      );
+
+      const firstImage = screen.getByAltText('Test image 1');
+
+      await act(async () => {
+        await user.click(firstImage);
+      });
+
+      await waitFor(() => {
+        expect(MockNextImage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            src: 'https://example.com/image1.jpg',
+            alt: 'Test image 1',
+            width: 1200,
+            height: 800,
+            priority: true,
+            loading: 'eager'
+          }),
+          expect.any(Object)
+        );
+      });
     });
   });
 });

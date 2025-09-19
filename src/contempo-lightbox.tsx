@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef } from 'react';
-import { ContempoLightboxProps } from './types';
+import { ContempoLightboxProps, RenderImageProps } from './types';
 import './contempo-lightbox.css';
 
 export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
@@ -9,10 +9,13 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
   onClose,
   onNext,
   onPrev,
-  className = ''
+  className = '',
+  NextImage,
+  useNextImage = false,
+  renderImage,
+  nextImageProps = {}
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
@@ -38,11 +41,60 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
     }
   }, [onClose]);
 
+  const renderImageElement = useCallback((
+    image: typeof images[0],
+    index: number
+  ) => {
+    const imageProps: RenderImageProps = {
+      image,
+      index,
+      isLightbox: true,
+      className: "contempo-lightbox__image",
+      loading: 'eager'
+    };
+
+    // Custom render prop takes precedence
+    if (renderImage) {
+      return renderImage(imageProps);
+    }
+
+    // Use Next.js Image if provided and enabled
+    if (useNextImage && NextImage) {
+      const nextProps = {
+        src: image.src,
+        alt: image.alt || `Gallery image ${index + 1}`,
+        className: "contempo-lightbox__image",
+        loading: 'eager',
+        ...nextImageProps,
+        // Include Next.js specific props from image if they exist
+        ...(image.width && { width: image.width }),
+        ...(image.height && { height: image.height }),
+        ...(image.fill && { fill: image.fill }),
+        ...(image.sizes && { sizes: image.sizes }),
+        ...(image.priority && { priority: image.priority }),
+        ...(image.quality && { quality: image.quality }),
+        ...(image.placeholder && { placeholder: image.placeholder }),
+        ...(image.blurDataURL && { blurDataURL: image.blurDataURL })
+      };
+
+      return React.createElement(NextImage, nextProps);
+    }
+
+    // Fallback to native img
+    return (
+      <img
+        src={image.src}
+        alt={image.alt || `Gallery image ${index + 1}`}
+        className="contempo-lightbox__image"
+      />
+    );
+  }, [NextImage, useNextImage, renderImage, nextImageProps]);
+
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
-      
+
       // Focus the modal for screen readers
       if (modalRef.current) {
         modalRef.current.focus();
@@ -97,12 +149,7 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
         )}
 
         <div className="contempo-lightbox__image-container">
-          <img
-            ref={imageRef}
-            src={currentImage.src}
-            alt={currentImage.alt || `Gallery image ${currentIndex + 1}`}
-            className="contempo-lightbox__image"
-          />
+          {renderImageElement(currentImage, currentIndex)}
           {currentImage.caption && (
             <div className="contempo-lightbox__caption">
               {currentImage.caption}
