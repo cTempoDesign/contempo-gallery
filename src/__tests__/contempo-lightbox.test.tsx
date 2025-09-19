@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ContempoLightbox } from '../ContempoLightbox';
+import { ContempoLightbox } from '../contempo-lightbox';
 import { ContempoGalleryImage } from '../types';
 
 const mockImages: ContempoGalleryImage[] = [

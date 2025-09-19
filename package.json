@@ -1,6 +1,6 @@
 {
   "name": "contempo-gallery",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A dynamic responsive React image gallery component with lightbox functionality",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

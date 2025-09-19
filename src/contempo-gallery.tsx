@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { ContempoGalleryProps } from './types';
-import { ContempoLightbox } from './ContempoLightbox';
-import './ContempoGallery.css';
+import { ContempoLightbox } from './contempo-lightbox';
+import './contempo-gallery.css';
 
 export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
   images,

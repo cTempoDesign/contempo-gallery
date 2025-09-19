@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { ContempoLightboxProps } from './types';
-import './ContempoLightbox.css';
+import './contempo-lightbox.css';
 
 export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
   images,
