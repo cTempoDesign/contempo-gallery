@@ -1,6 +1,6 @@
 # Contempo Gallery
 
-A dynamic responsive React image gallery component with lightbox functionality, built with TypeScript and designed for accessibility.
+A framework-agnostic React image gallery component with lightbox functionality, built with TypeScript and designed for accessibility. Optionally supports Next.js Image optimization for enhanced performance.
 
 ## 🌟 [Live Demo](https://contempo-gallery-showcase.vercel.app/)
 
@@ -15,6 +15,8 @@ See the gallery in action with multiple configurations and examples.
 - 📱 **Mobile Friendly**: Optimized for touch devices
 - 🎨 **Customizable**: Easy to theme and customize
 - ⚡ **Performance**: Lazy loading and optimized rendering
+- 🖼️ **Next.js Image Support**: Optional Next.js Image optimization
+- 🔧 **Custom Render Props**: Full control over image rendering
 
 ## Installation
 
@@ -22,7 +24,9 @@ See the gallery in action with multiple configurations and examples.
 npm install contempo-gallery
 ```
 
-## Basic Usage
+## Basic Usage (Non-Next.js Applications)
+
+Perfect for Create React App, Vite, or any React application:
 
 ```tsx
 import React from 'react';
@@ -38,7 +42,8 @@ const images = [
   {
     src: 'https://example.com/image2.jpg',
     alt: 'City skyline',
-    caption: 'Modern city architecture'
+    caption: 'Modern city architecture',
+    thumbnail: 'https://example.com/thumb2.jpg' // Optional thumbnail
   },
   {
     src: 'https://example.com/image3.jpg',
@@ -48,258 +53,376 @@ const images = [
 
 function App() {
   return (
-    <div>
+    <div className="App">
       <h1>My Photo Gallery</h1>
-      <ContempoGallery images={images} columns={3} gap={12} />
+      <ContempoGallery
+        images={images}
+        columns={3}
+        gap={16}
+      />
     </div>
   );
 }
+
+export default App;
 ```
 
-## Props
+## Next.js Usage (With Image Optimization)
 
-### Gallery Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `images` | `ContempoGalleryImage[]` | required | Array of images to display |
-| `columns` | `number` | `3` | Number of columns in the grid |
-| `gap` | `number` | `8` | Gap between images in pixels |
-| `className` | `string` | `''` | Additional CSS class for the gallery |
-| `onImageClick` | `(index: number, image: ContempoGalleryImage) => void` | - | Callback when an image is clicked |
-| `showLightbox` | `boolean` | `true` | Whether to show the lightbox on image click |
-| `lightboxClassName` | `string` | `''` | Additional CSS class for the lightbox |
-
-### ContempoGalleryImage Interface
+For Next.js applications, you can enable Next.js Image optimization for better performance:
 
 ```tsx
-interface ContempoGalleryImage {
-  src: string;           // Main image URL
-  alt?: string;          // Alt text for accessibility
-  caption?: string;      // Optional caption text
-  thumbnail?: string;    // Optional thumbnail URL (uses src if not provided)
+import React from 'react';
+import Image from 'next/image';
+import { ContempoGallery } from 'contempo-gallery';
+
+const images = [
+  {
+    src: 'https://example.com/image1.jpg',
+    alt: 'Beautiful landscape',
+    caption: 'A stunning mountain view',
+    width: 800,
+    height: 600,
+    priority: true // First image can be prioritized
+  },
+  {
+    src: 'https://example.com/image2.jpg',
+    alt: 'City skyline',
+    caption: 'Modern city architecture',
+    thumbnail: 'https://example.com/thumb2.jpg',
+    width: 800,
+    height: 600,
+    quality: 90
+  },
+  {
+    src: 'https://example.com/image3.jpg',
+    alt: 'Ocean waves',
+    width: 800,
+    height: 600,
+    fill: false,
+    sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+  }
+];
+
+function GalleryPage() {
+  return (
+    <div>
+      <h1>My Next.js Photo Gallery</h1>
+      <ContempoGallery
+        images={images}
+        NextImage={Image}
+        useNextImage={true}
+        columns={3}
+        gap={16}
+        // Pass additional props to all Next.js Image components
+        nextImageProps={{
+          sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+          placeholder: 'blur'
+        }}
+      />
+    </div>
+  );
 }
+
+export default GalleryPage;
 ```
 
-## Advanced Usage
+### Next.js Configuration for Remote Images
 
-### Custom Click Handler
+When using Next.js Image with remote URLs, you need to configure `next.config.js`:
+
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    // For Next.js 13+, use remotePatterns
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        port: '',
+        pathname: '/images/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'your-cdn.com',
+        port: '',
+        pathname: '**',
+      }
+    ],
+    // For older Next.js versions, use domains
+    // domains: ['example.com', 'your-cdn.com'],
+  },
+}
+
+module.exports = nextConfig;
+```
+
+## Custom Image Rendering
+
+For complete control over image rendering, use the `renderImage` prop:
 
 ```tsx
-import { ContempoGallery, ContempoGalleryImage } from 'contempo-gallery';
+import React from 'react';
+import { ContempoGallery, RenderImageProps } from 'contempo-gallery';
+
+const customRenderImage = (props: RenderImageProps) => {
+  const { image, index, isLightbox, className, onClick, onKeyDown, ...rest } = props;
+
+  if (isLightbox) {
+    // Custom lightbox image rendering
+    return (
+      <div className="custom-lightbox-container">
+        <img
+          src={image.src}
+          alt={image.alt}
+          className={className}
+          style={{ filter: 'brightness(1.1)' }}
+        />
+        {image.caption && (
+          <p className="custom-caption">{image.caption}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Custom gallery image rendering
+  return (
+    <div
+      className="custom-image-wrapper"
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      {...rest}
+    >
+      <img
+        src={image.thumbnail || image.src}
+        alt={image.alt}
+        className={className}
+        style={{ borderRadius: '8px' }}
+      />
+      <div className="image-overlay">
+        <span>View #{index + 1}</span>
+      </div>
+    </div>
+  );
+};
 
 function CustomGallery() {
-  const handleImageClick = (index: number, image: ContempoGalleryImage) => {
-    console.log(`Clicked image ${index}:`, image);
-    // Custom logic here
-  };
-
   return (
-    <ContempoGallery 
+    <ContempoGallery
       images={images}
-      onImageClick={handleImageClick}
-      showLightbox={false} // Disable built-in lightbox
+      renderImage={customRenderImage}
     />
   );
 }
 ```
 
-### Responsive Columns
+## API Reference
 
-```tsx
-// The gallery automatically adapts:
-// - Desktop: Uses your specified column count
-// - Tablet (≤768px): Max 2 columns
-// - Mobile (≤480px): Single column
+### ContempoGalleryProps
 
-<ContempoGallery 
-  images={images}
-  columns={4} // Will show 4 on desktop, 2 on tablet, 1 on mobile
-/>
-```
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `images` | `ContempoGalleryImage[]` | **required** | Array of image objects |
+| `columns` | `number` | `3` | Number of columns in desktop view |
+| `gap` | `number` | `8` | Gap between images in pixels |
+| `className` | `string` | `''` | Additional CSS class for gallery container |
+| `onImageClick` | `(index, image) => void` | `undefined` | Callback when image is clicked |
+| `showLightbox` | `boolean` | `true` | Whether to show lightbox on image click |
+| `lightboxClassName` | `string` | `''` | Additional CSS class for lightbox |
+| `NextImage` | `React.ComponentType` | `undefined` | Next.js Image component |
+| `useNextImage` | `boolean` | `false` | Whether to use Next.js Image optimization |
+| `renderImage` | `RenderImageFunction` | `undefined` | Custom image render function |
+| `nextImageProps` | `object` | `{}` | Additional props passed to Next.js Image |
 
-### With Thumbnails
+### ContempoGalleryImage
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `src` | `string` | ✅ | Main image URL |
+| `alt` | `string` | ❌ | Alt text for accessibility |
+| `caption` | `string` | ❌ | Caption displayed below image |
+| `thumbnail` | `string` | ❌ | Thumbnail URL (fallback to `src`) |
+| `width` | `number` | ❌ | Image width (Next.js Image) |
+| `height` | `number` | ❌ | Image height (Next.js Image) |
+| `fill` | `boolean` | ❌ | Use fill mode (Next.js Image) |
+| `sizes` | `string` | ❌ | Responsive sizes (Next.js Image) |
+| `priority` | `boolean` | ❌ | High priority loading (Next.js Image) |
+| `quality` | `number` | ❌ | Image quality 1-100 (Next.js Image) |
+| `placeholder` | `'blur' \| 'empty'` | ❌ | Placeholder type (Next.js Image) |
+| `blurDataURL` | `string` | ❌ | Blur placeholder data URL (Next.js Image) |
+
+## SSR and Hydration Considerations
+
+When using Next.js Image optimization:
+
+### 1. Provide Width and Height
+
+Always provide `width` and `height` to prevent layout shift:
 
 ```tsx
 const images = [
   {
-    src: 'https://example.com/full-image1.jpg',
-    thumbnail: 'https://example.com/thumb-image1.jpg',
-    alt: 'Description',
-    caption: 'Image caption'
+    src: '/image.jpg',
+    alt: 'Example',
+    width: 800,
+    height: 600, // Prevents CLS (Cumulative Layout Shift)
   }
-  // ...
 ];
 ```
 
-## Keyboard Controls
+### 2. Use Fill with Container
 
-When the lightbox is open:
-- `←` / `→` Arrow keys: Navigate between images  
-- `Escape`: Close the lightbox
-- `Tab`: Navigate through interactive elements
+For responsive images, use `fill` with a positioned container:
+
+```tsx
+const images = [
+  {
+    src: '/image.jpg',
+    alt: 'Example',
+    fill: true,
+    sizes: '(max-width: 768px) 100vw, 50vw'
+  }
+];
+
+// Add CSS for containers
+// .contempo-gallery__image { position: relative; }
+```
+
+### 3. Priority Loading
+
+Mark above-the-fold images as priority:
+
+```tsx
+const images = [
+  {
+    src: '/hero-image.jpg',
+    alt: 'Hero image',
+    priority: true, // Loads immediately
+    width: 800,
+    height: 600
+  }
+];
+```
 
 ## Styling
 
-The gallery comes with built-in responsive styles, but you can customize it:
+The component comes with default styles, but you can customize them:
+
+### CSS Custom Properties
 
 ```css
-/* Override default styles */
 .contempo-gallery {
-  border-radius: 12px;
-  overflow: hidden;
+  --gallery-columns: 3;
+  --gallery-gap: 8px;
 }
 
-.contempo-gallery__item {
-  border-radius: 8px;
+/* Custom responsive breakpoints */
+@media (max-width: 768px) {
+  .contempo-gallery {
+    --gallery-columns: 2;
+  }
 }
 
-.contempo-lightbox {
-  background: rgba(0, 0, 0, 0.95);
+@media (max-width: 480px) {
+  .contempo-gallery {
+    --gallery-columns: 1;
+  }
 }
 ```
 
-## Accessibility Features
+### Custom Styling
 
-- Proper ARIA labels and roles
-- Keyboard navigation support
-- Screen reader announcements
-- Focus management
-- High contrast mode support
-- Reduced motion support
+```css
+/* Gallery container */
+.contempo-gallery {
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* Individual image items */
+.contempo-gallery__item {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.contempo-gallery__item:hover {
+  transform: scale(1.02);
+}
+
+/* Image styling */
+.contempo-gallery__image {
+  border-radius: 4px;
+}
+
+/* Caption styling */
+.contempo-gallery__caption {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* Lightbox customization */
+.contempo-lightbox {
+  backdrop-filter: blur(8px);
+}
+
+.contempo-lightbox__image {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+```
+
+## TypeScript Support
+
+The package is built with TypeScript and includes full type definitions:
+
+```tsx
+import {
+  ContempoGallery,
+  ContempoGalleryProps,
+  ContempoGalleryImage,
+  RenderImageProps,
+  RenderImageFunction
+} from 'contempo-gallery';
+
+// Fully typed image array
+const images: ContempoGalleryImage[] = [
+  {
+    src: '/image.jpg',
+    alt: 'Typed image',
+    width: 800,
+    height: 600
+  }
+];
+
+// Typed render function
+const renderImage: RenderImageFunction = (props: RenderImageProps) => {
+  // props are fully typed
+  return <img src={props.image.src} alt={props.image.alt} />;
+};
+```
+
+## Performance Tips
+
+1. **Use thumbnails** for gallery view and full-size for lightbox
+2. **Enable Next.js Image optimization** for automatic format conversion and optimization
+3. **Set appropriate `sizes`** for responsive images
+4. **Use `priority`** for above-the-fold images
+5. **Lazy loading** is enabled by default for gallery images
 
 ## Browser Support
 
-- Modern browsers (Chrome, Firefox, Safari, Edge)
-- IE 11+ (with polyfills)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Testing
-
-This package includes comprehensive unit tests with high coverage requirements.
-
-### Running Tests
-
-```bash
-# Run all tests once
-npm test
-
-# Run tests in watch mode during development
-npm run test:watch
-
-# Run tests with coverage report
-npm run test:coverage
-```
-
-### Test Coverage
-
-The test suite maintains high coverage standards:
-- **Branches**: 90%
-- **Functions**: 90% 
-- **Lines**: 90%
-- **Statements**: 90%
-
-Coverage reports are generated in the `coverage/` directory and include:
-- Terminal summary
-- HTML report (`coverage/lcov-report/index.html`)
-- LCOV format for CI integration
-
-### Test Structure
-
-Tests are organized in `src/__tests__/`:
-- `ContempoGallery.test.tsx` - Gallery component tests
-- `ContempoLightbox.test.tsx` - Lightbox component tests  
-- `types.test.ts` - Type definition tests
-
-### What's Tested
-
-**ContempoGallery Component:**
-- Rendering with various props
-- Image display and thumbnails
-- Responsive grid behavior
-- Lightbox integration
-- Keyboard navigation
-- Accessibility features
-- Click handlers and callbacks
-
-**ContempoLightbox Component:**
-- Modal display and hiding
-- Image navigation (next/prev)
-- Keyboard shortcuts (ESC, arrows)
-- Focus management
-- Body scroll locking
-- Touch/click handling
-- Screen reader support
-
-**Types:**
-- Interface completeness
-- Optional properties
-- Callback signatures
-
-### Continuous Integration
-
-Tests run automatically on:
-- Pull requests
-- Builds
-- Deployments (Vercel)
-
-## Development & Examples
-
-### Running the Local Showcase
-
-To see the gallery in action and test different configurations:
-
-```bash
-# Clone or navigate to the project
-cd contempo-gallery/example
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-The showcase will be available at `http://localhost:5173/` and includes:
-
-- **Basic 3-column gallery** with sample images
-- **4-column gallery** variant  
-- **2-column gallery** with larger gaps
-- **Gallery without lightbox** (custom click handler demo)
-- **Responsive behavior** testing
-
-### Development Features
-
-- **Hot reload** - Changes to components auto-refresh
-- **TypeScript support** - Full type checking
-- **Responsive testing** - Resize browser to test breakpoints
-- **Accessibility testing** - Use keyboard navigation and screen readers
-
-### Building the Package
-
-```bash
-# Build for distribution
-npm run build
-
-# Run linting
-npm run lint
-
-# Type checking
-npm run typecheck
-```
-
-## TypeScript
-
-Fully typed with TypeScript. All props and interfaces are exported:
-
-```tsx
-import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from 'contempo-gallery';
-```
-
-## License
-
-MIT © Contempo Web Design
+- Chrome 60+
+- Firefox 60+
+- Safari 12+
+- Edge 79+
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## License
+
+MIT © [Contempo Web Design](https://github.com/cTempoDesign)
