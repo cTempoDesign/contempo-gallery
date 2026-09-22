@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContempoLightbox } from '../ContempoLightbox';
@@ -333,5 +332,32 @@ describe('ContempoLightbox', () => {
     unmount();
     
     expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+  });
+
+  test('restores the previous body overflow value on close', () => {
+    document.body.style.overflow = 'scroll';
+    const { rerender } = render(<ContempoLightbox {...defaultProps} />);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    rerender(<ContempoLightbox {...defaultProps} isOpen={false} />);
+    expect(document.body.style.overflow).toBe('scroll');
+  });
+
+  test('returns focus to the previously focused element on close', () => {
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+
+    const { rerender } = render(<ContempoLightbox {...defaultProps} />);
+    expect(document.activeElement).toBe(screen.getByRole('dialog'));
+
+    rerender(<ContempoLightbox {...defaultProps} isOpen={false} />);
+    expect(document.activeElement).toBe(trigger);
+    trigger.remove();
+  });
+
+  test('renders nothing when currentIndex is out of range', () => {
+    render(<ContempoLightbox {...defaultProps} currentIndex={10} />);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
