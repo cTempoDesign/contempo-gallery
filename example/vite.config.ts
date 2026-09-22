@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'contempo-gallery': path.resolve(__dirname, '../src')
+      '@ctempodesign/contempo-gallery': path.resolve(__dirname, '../src')
     }
   }
 });

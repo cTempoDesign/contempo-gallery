@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContempoGallery, ContempoGalleryImage } from 'contempo-gallery';
+import { ContempoGallery, ContempoGalleryImage } from '@ctempodesign/contempo-gallery';
 
 // Sample images for demonstration
 const sampleImages: ContempoGalleryImage[] = [

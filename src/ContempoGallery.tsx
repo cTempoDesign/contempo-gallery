@@ -46,7 +46,7 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
   return (
     <>
       <div 
-        className={`contempo-gallery ${className}`}
+        className={`contempo-gallery ${className}`.trim()}
         style={gridStyle}
         role="grid"
         aria-label="Image gallery"
@@ -84,7 +84,7 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
       {showLightbox && (
         <ContempoLightbox
           images={images}
-          currentIndex={currentIndex}
+          currentIndex={Math.min(currentIndex, images.length - 1)}
           isOpen={lightboxOpen}
           onClose={handleLightboxClose}
           onNext={handleNext}
