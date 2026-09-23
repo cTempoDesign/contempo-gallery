@@ -4,10 +4,12 @@
 
 ## Releasing a new version
 
-1. Bump the version in `package.json` (`npm version patch|minor|major --no-git-tag-version`) in your PR.
-2. Merge to `master`.
+Every push to `master` publishes a new version to npm:
 
-The workflow runs lint, typecheck, tests and build on every pull request and every push to `master`. On `master`, if the `package.json` version isn't on npm yet, it runs `npm publish`. A merge without a version bump runs the checks and publishes nothing.
+- **Patch releases are automatic.** If `package.json` isn't bumped, the workflow publishes the next patch after the latest version on npm (e.g. `1.2.1` → `1.2.2`). That version exists only on npm; `package.json` in the repo is not rewritten.
+- **Minor or major releases:** bump the version in your PR (`npm version minor|major --no-git-tag-version`). If it's higher than the latest on npm, it's published as-is.
+
+The workflow runs lint, typecheck, tests and build on every pull request and every push to `master`; nothing publishes if any check fails.
 
 Publishing uses npm **trusted publishing**: GitHub Actions proves its identity to npm with a short-lived OIDC token (`id-token: write`), so no npm token is stored in GitHub. npm also attaches a provenance attestation linking each version to the commit and workflow run that built it.
 
