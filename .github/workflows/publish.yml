@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  id-token: write # npm trusted publishing (OIDC): no npm token stored anywhere
 
 jobs:
   publish:
@@ -19,14 +19,14 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
 
-      # Publish only on master, and only when package.json has a version not yet published
+      # On master, publish to npmjs.com only when package.json has a version not yet published
       - name: Publish if version is new
         if: github.event_name == 'push'
         run: |
@@ -35,7 +35,6 @@ jobs:
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
             echo "$NAME@$VERSION already published; bump the version in package.json to release."
           else
+            npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
             npm publish
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

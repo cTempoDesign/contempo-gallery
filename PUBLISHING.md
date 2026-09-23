@@ -1,35 +1,48 @@
 # Publishing
 
-`@ctempodesign/contempo-gallery` publishes to GitHub Packages automatically via `.github/workflows/publish.yml`.
+`@contempo/react-photo-gallery` publishes to the public npm registry automatically via `.github/workflows/publish.yml`.
 
 ## Releasing a new version
 
-1. Bump the version in `package.json` (`npm version patch|minor|major --no-git-tag-version`).
+1. Bump the version in `package.json` (`npm version patch|minor|major --no-git-tag-version`) in your PR.
 2. Merge to `master`.
 
-On every push to `master` the workflow lints, typechecks, tests and builds. If the `package.json` version is not already published, it runs `npm publish` using the built-in `GITHUB_TOKEN`; otherwise it skips publishing. Pull requests run the same checks without publishing.
+The workflow runs lint, typecheck, tests and build on every pull request and every push to `master`. On `master`, if the `package.json` version isn't on npm yet, it runs `npm publish`. A merge without a version bump runs the checks and publishes nothing.
 
-Versions are immutable: to release a change, bump the version.
+Publishing uses npm **trusted publishing**: GitHub Actions proves its identity to npm with a short-lived OIDC token (`id-token: write`), so no npm token is stored in GitHub. npm also attaches a provenance attestation linking each version to the commit and workflow run that built it.
 
-## Installing in another project
+## One-time setup
 
-Add `.npmrc` to the consuming project:
+npm only allows trusted publishing for a package that already exists, so the very first version is published by hand ([npm/cli#8544](https://github.com/npm/cli/issues/8544)).
 
-```
-@ctempodesign:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+1. On npmjs.com, create the free organization `contempo` (avatar menu → **Add Organization**, choose the free/unlimited public packages plan).
+2. Publish the first version from your machine (you'll be asked to sign in, with 2FA):
+   ```bash
+   git clone https://github.com/cTempoDesign/contempo-gallery && cd contempo-gallery
+   npm login
+   npm ci
+   npm publish
+   ```
+3. On npmjs.com, open `@contempo/react-photo-gallery` → **Settings → Trusted Publisher → GitHub Actions** and enter:
+   - Organization or user: `cTempoDesign`
+   - Repository: `contempo-gallery`
+   - Workflow filename: `publish.yml`
+4. Recommended: on the same settings page, set **Publishing access** to "Require two-factor authentication and disallow tokens", so only this workflow can publish.
 
-`GITHUB_TOKEN` needs `read:packages` scope. Locally, use a classic personal access token; on Vercel, add it as an environment variable; in GitHub Actions of another repo, grant that repo access under the package's settings (Package settings → Manage Actions access) and use `secrets.GITHUB_TOKEN`.
+Only step 3 needs redoing, and only if the repository or workflow file is renamed.
+
+## Installing in an app
 
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install @contempo/react-photo-gallery
 ```
+
+Apps pick up new minor and patch releases with `npm update @contempo/react-photo-gallery`. A new major version needs `npm install @contempo/react-photo-gallery@latest`.
 
 ## Testing a build locally
 
 ```bash
 npm run build
-npm pack                     # creates ctempodesign-contempo-gallery-<version>.tgz
-cd /path/to/app && npm install /path/to/ctempodesign-contempo-gallery-<version>.tgz
+npm pack                     # creates contempo-react-photo-gallery-<version>.tgz
+cd /path/to/app && npm install /path/to/contempo-react-photo-gallery-<version>.tgz
 ```

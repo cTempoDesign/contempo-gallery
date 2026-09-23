@@ -1,5 +1,5 @@
 {
-  "name": "@ctempodesign/contempo-gallery",
+  "name": "@contempo/react-photo-gallery",
   "version": "1.2.0",
   "description": "A dynamic responsive React image gallery component with lightbox functionality",
   "main": "dist/index.js",
@@ -39,7 +39,7 @@
   "author": "Contempo Web Design, ContempoWebDesign@gmail.com",
   "license": "MIT",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

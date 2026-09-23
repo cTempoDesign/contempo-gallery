@@ -18,18 +18,11 @@ See the gallery in action with multiple configurations and examples.
 
 ## Installation
 
-This package is published to **GitHub Packages**. In the consuming project, add an `.npmrc` next to its `package.json`:
-
-```
-@ctempodesign:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-`GITHUB_TOKEN` must be a GitHub token with `read:packages` scope (a classic personal access token locally; set it as an environment variable in Vercel/CI). Then install as usual:
-
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install @contempo/react-photo-gallery
 ```
+
+Published on the public npm registry: no token or `.npmrc` needed.
 
 ## Next.js
 
@@ -37,7 +30,7 @@ Works with the App Router out of the box. The build ships with a `'use client'` 
 
 ```tsx
 // app/gallery/page.tsx
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/react-photo-gallery';
 
 export default function Page() {
   return <ContempoGallery images={[{ src: '/photos/one.jpg', alt: 'One' }]} />;
@@ -48,7 +41,7 @@ export default function Page() {
 
 ```tsx
 import React from 'react';
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/react-photo-gallery';
 // CSS styles are automatically imported, no need to import manually
 
 const images = [
@@ -115,7 +108,7 @@ interface ContempoGalleryImage {
 ### Custom Click Handler
 
 ```tsx
-import { ContempoGallery, ContempoGalleryImage } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery, ContempoGalleryImage } from '@contempo/react-photo-gallery';
 
 function CustomGallery() {
   const handleImageClick = (index: number, image: ContempoGalleryImage) => {
@@ -140,7 +133,7 @@ Render props are functions, so they must be passed from a client component. Keep
 ```tsx
 'use client';
 import Image from 'next/image';
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/react-photo-gallery';
 
 type Photo = { src: string; alt: string; blurDataURL: string; photoId: string };
 
@@ -356,7 +349,7 @@ npm run typecheck
 Fully typed with TypeScript. All props and interfaces are exported:
 
 ```tsx
-import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from '@contempo/react-photo-gallery';
 ```
 
 ## License
