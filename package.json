@@ -38,9 +38,6 @@
   ],
   "author": "Contempo Web Design, ContempoWebDesign@gmail.com",
   "license": "MIT",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"

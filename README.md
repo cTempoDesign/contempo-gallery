@@ -18,18 +18,13 @@ See the gallery in action with multiple configurations and examples.
 
 ## Installation
 
-This package is published to **GitHub Packages**. In the consuming project, add an `.npmrc` next to its `package.json`:
-
-```
-@ctempodesign:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-`GITHUB_TOKEN` must be a GitHub token with `read:packages` scope (a classic personal access token locally; set it as an environment variable in Vercel/CI). Then install as usual:
+Install straight from GitHub (public, no token or `.npmrc` needed):
 
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install "github:cTempoDesign/contempo-gallery#semver:^1.2.0"
 ```
+
+This installs the newest release tag matching the range. Releases ship prebuilt, so nothing compiles during install. To pick up newer releases later, run `npm update @ctempodesign/contempo-gallery`. A new major version (breaking changes) needs the range changed by hand, e.g. `#semver:^2.0.0`.
 
 ## Next.js
 

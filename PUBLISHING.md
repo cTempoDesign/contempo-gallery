@@ -1,30 +1,27 @@
 # Publishing
 
-`@ctempodesign/contempo-gallery` publishes to GitHub Packages automatically via `.github/workflows/publish.yml`.
+Releases are automatic. `.github/workflows/publish.yml` runs lint, typecheck, tests and build on every pull request and every push to `master`.
 
 ## Releasing a new version
 
-1. Bump the version in `package.json` (`npm version patch|minor|major --no-git-tag-version`).
+1. Bump the version in `package.json` (`npm version patch|minor|major --no-git-tag-version`) in your PR.
 2. Merge to `master`.
 
-On every push to `master` the workflow lints, typechecks, tests and builds. If the `package.json` version is not already published, it runs `npm publish` using the built-in `GITHUB_TOKEN`; otherwise it skips publishing. Pull requests run the same checks without publishing.
+If no `v<version>` tag exists yet, the workflow:
 
-Versions are immutable: to release a change, bump the version.
+- builds `dist/`
+- commits it on top of `master` with the build scripts and devDependencies removed (this commit is only reachable from the tag; `master` is untouched)
+- pushes the tag `v<version>` and creates a GitHub Release with generated notes
 
-## Installing in another project
+A push without a version bump runs the checks and releases nothing. No tokens, secrets or npm account are involved; the workflow uses GitHub's built-in token.
 
-Add `.npmrc` to the consuming project:
-
-```
-@ctempodesign:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-`GITHUB_TOKEN` needs `read:packages` scope. Locally, use a classic personal access token; on Vercel, add it as an environment variable; in GitHub Actions of another repo, grant that repo access under the package's settings (Package settings → Manage Actions access) and use `secrets.GITHUB_TOKEN`.
+## Installing in an app
 
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install "github:cTempoDesign/contempo-gallery#semver:^1.2.0"
 ```
+
+Because the tagged commit already contains `dist/` and has no build scripts, npm just copies the files. Apps pick up new minor and patch releases with `npm update @ctempodesign/contempo-gallery`; a new major version needs the range changed.
 
 ## Testing a build locally
 
