@@ -8,7 +8,7 @@ export default defineConfig({
     // The gallery source lives outside this app; force one React copy or hooks break
     dedupe: ['react', 'react-dom'],
     alias: {
-      '@contempo/gallery': path.resolve(__dirname, '../src')
+      '@contempo/react-photo-gallery': path.resolve(__dirname, '../src')
     }
   }
 });

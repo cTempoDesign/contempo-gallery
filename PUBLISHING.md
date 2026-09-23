@@ -1,6 +1,6 @@
 # Publishing
 
-`@contempo/gallery` publishes to the public npm registry automatically via `.github/workflows/publish.yml`.
+`@contempo/react-photo-gallery` publishes to the public npm registry automatically via `.github/workflows/publish.yml`.
 
 ## Releasing a new version
 
@@ -23,7 +23,7 @@ npm only allows trusted publishing for a package that already exists, so the ver
    npm ci
    npm publish
    ```
-3. On npmjs.com, open `@contempo/gallery` → **Settings → Trusted Publisher → GitHub Actions** and enter:
+3. On npmjs.com, open `@contempo/react-photo-gallery` → **Settings → Trusted Publisher → GitHub Actions** and enter:
    - Organization or user: `cTempoDesign`
    - Repository: `contempo-gallery`
    - Workflow filename: `publish.yml`
@@ -34,15 +34,15 @@ Only step 3 needs redoing, and only if the repository or workflow file is rename
 ## Installing in an app
 
 ```bash
-npm install @contempo/gallery
+npm install @contempo/react-photo-gallery
 ```
 
-Apps pick up new minor and patch releases with `npm update @contempo/gallery`. A new major version needs `npm install @contempo/gallery@latest`.
+Apps pick up new minor and patch releases with `npm update @contempo/react-photo-gallery`. A new major version needs `npm install @contempo/react-photo-gallery@latest`.
 
 ## Testing a build locally
 
 ```bash
 npm run build
-npm pack                     # creates contempo-gallery-<version>.tgz
-cd /path/to/app && npm install /path/to/contempo-gallery-<version>.tgz
+npm pack                     # creates contempo-react-photo-gallery-<version>.tgz
+cd /path/to/app && npm install /path/to/contempo-react-photo-gallery-<version>.tgz
 ```

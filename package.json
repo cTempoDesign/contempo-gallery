@@ -1,5 +1,5 @@
 {
-  "name": "@contempo/gallery",
+  "name": "@contempo/react-photo-gallery",
   "version": "1.2.0",
   "description": "A dynamic responsive React image gallery component with lightbox functionality",
   "main": "dist/index.js",
