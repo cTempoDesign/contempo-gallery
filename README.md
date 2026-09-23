@@ -19,7 +19,7 @@ See the gallery in action with multiple configurations and examples.
 ## Installation
 
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install @contempo/gallery
 ```
 
 Published on the public npm registry: no token or `.npmrc` needed.
@@ -30,7 +30,7 @@ Works with the App Router out of the box. The build ships with a `'use client'` 
 
 ```tsx
 // app/gallery/page.tsx
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/gallery';
 
 export default function Page() {
   return <ContempoGallery images={[{ src: '/photos/one.jpg', alt: 'One' }]} />;
@@ -41,7 +41,7 @@ export default function Page() {
 
 ```tsx
 import React from 'react';
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/gallery';
 // CSS styles are automatically imported, no need to import manually
 
 const images = [
@@ -108,7 +108,7 @@ interface ContempoGalleryImage {
 ### Custom Click Handler
 
 ```tsx
-import { ContempoGallery, ContempoGalleryImage } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery, ContempoGalleryImage } from '@contempo/gallery';
 
 function CustomGallery() {
   const handleImageClick = (index: number, image: ContempoGalleryImage) => {
@@ -133,7 +133,7 @@ Render props are functions, so they must be passed from a client component. Keep
 ```tsx
 'use client';
 import Image from 'next/image';
-import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery } from '@contempo/gallery';
 
 type Photo = { src: string; alt: string; blurDataURL: string; photoId: string };
 
@@ -349,7 +349,7 @@ npm run typecheck
 Fully typed with TypeScript. All props and interfaces are exported:
 
 ```tsx
-import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from '@ctempodesign/contempo-gallery';
+import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from '@contempo/gallery';
 ```
 
 ## License

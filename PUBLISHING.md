@@ -1,6 +1,6 @@
 # Publishing
 
-`@ctempodesign/contempo-gallery` publishes to the public npm registry automatically via `.github/workflows/publish.yml`.
+`@contempo/gallery` publishes to the public npm registry automatically via `.github/workflows/publish.yml`.
 
 ## Releasing a new version
 
@@ -15,7 +15,7 @@ Publishing uses npm **trusted publishing**: GitHub Actions proves its identity t
 
 npm only allows trusted publishing for a package that already exists, so the very first version is published by hand ([npm/cli#8544](https://github.com/npm/cli/issues/8544)).
 
-1. On npmjs.com, create the free organization `ctempodesign` (avatar menu → **Add Organization**, choose the free/unlimited public packages plan).
+1. On npmjs.com, create the free organization `contempo` (avatar menu → **Add Organization**, choose the free/unlimited public packages plan).
 2. Publish the first version from your machine (you'll be asked to sign in, with 2FA):
    ```bash
    git clone https://github.com/cTempoDesign/contempo-gallery && cd contempo-gallery
@@ -23,7 +23,7 @@ npm only allows trusted publishing for a package that already exists, so the ver
    npm ci
    npm publish
    ```
-3. On npmjs.com, open `@ctempodesign/contempo-gallery` → **Settings → Trusted Publisher → GitHub Actions** and enter:
+3. On npmjs.com, open `@contempo/gallery` → **Settings → Trusted Publisher → GitHub Actions** and enter:
    - Organization or user: `cTempoDesign`
    - Repository: `contempo-gallery`
    - Workflow filename: `publish.yml`
@@ -34,15 +34,15 @@ Only step 3 needs redoing, and only if the repository or workflow file is rename
 ## Installing in an app
 
 ```bash
-npm install @ctempodesign/contempo-gallery
+npm install @contempo/gallery
 ```
 
-Apps pick up new minor and patch releases with `npm update @ctempodesign/contempo-gallery`. A new major version needs `npm install @ctempodesign/contempo-gallery@latest`.
+Apps pick up new minor and patch releases with `npm update @contempo/gallery`. A new major version needs `npm install @contempo/gallery@latest`.
 
 ## Testing a build locally
 
 ```bash
 npm run build
-npm pack                     # creates ctempodesign-contempo-gallery-<version>.tgz
-cd /path/to/app && npm install /path/to/ctempodesign-contempo-gallery-<version>.tgz
+npm pack                     # creates contempo-gallery-<version>.tgz
+cd /path/to/app && npm install /path/to/contempo-gallery-<version>.tgz
 ```
