@@ -18,13 +18,11 @@ See the gallery in action with multiple configurations and examples.
 
 ## Installation
 
-Install straight from GitHub (public, no token or `.npmrc` needed):
-
 ```bash
-npm install "github:cTempoDesign/contempo-gallery#semver:^1.2.0"
+npm install @ctempodesign/contempo-gallery
 ```
 
-This installs the newest release tag matching the range. Releases ship prebuilt, so nothing compiles during install. To pick up newer releases later, run `npm update @ctempodesign/contempo-gallery`. A new major version (breaking changes) needs the range changed by hand, e.g. `#semver:^2.0.0`.
+Published on the public npm registry: no token or `.npmrc` needed.
 
 ## Next.js
 
