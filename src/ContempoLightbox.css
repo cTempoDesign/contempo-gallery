@@ -104,6 +104,47 @@
   align-items: center;
 }
 
+.contempo-lightbox__slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  /* Eases a released drag back to centre; the drag itself sets transition: none */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  /* backwards, not both: a held final frame would override the drag transform */
+  animation: contempo-lightbox-zoom-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  touch-action: pan-y;
+}
+
+.contempo-lightbox__slide--next {
+  animation-name: contempo-lightbox-slide-from-right;
+}
+
+.contempo-lightbox__slide--prev {
+  animation-name: contempo-lightbox-slide-from-left;
+}
+
+@keyframes contempo-lightbox-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes contempo-lightbox-slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+@keyframes contempo-lightbox-slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+}
+
 .contempo-lightbox__image {
   max-width: 100%;
   max-height: calc(95vh - 120px);
@@ -228,9 +269,14 @@
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
-  .contempo-lightbox {
+  .contempo-lightbox,
+  .contempo-lightbox__slide {
     animation: none;
     opacity: 1;
+  }
+
+  .contempo-lightbox__slide {
+    transition: none;
   }
   
   .contempo-lightbox__close,

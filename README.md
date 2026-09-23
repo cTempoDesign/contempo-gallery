@@ -90,7 +90,7 @@ function App() {
 
 Images can carry extra fields (e.g. `photoId`); the component is generic, so `renderImage`, `renderLightboxFooter` and `onImageClick` receive your full image type.
 
-The lightbox supports arrow keys, Escape, and swipe left/right on touch screens.
+The lightbox supports arrow keys, Escape, and swipe left/right on touch screens. Images slide in from the direction you navigate, follow your finger while swiping, and the neighbouring images are preloaded so the next one is ready before you get there (skipped when you pass `renderImage`, which may load its own URLs).
 
 ### ContempoGalleryImage Interface
 

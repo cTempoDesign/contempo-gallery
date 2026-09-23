@@ -407,4 +407,78 @@ describe('ContempoLightbox', () => {
     fireEvent.keyDown(select, { key: 'Escape' });
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
   });
+  test('new images slide in from the side they were navigated towards', () => {
+    const { container, rerender } = render(<ContempoLightbox {...defaultProps} />);
+    const slide = () => container.querySelector('.contempo-lightbox__slide');
+    expect(slide()).toHaveClass('contempo-lightbox__slide--none');
+
+    fireEvent.click(screen.getByLabelText('Next image'));
+    rerender(<ContempoLightbox {...defaultProps} currentIndex={1} />);
+    expect(slide()).toHaveClass('contempo-lightbox__slide--next');
+
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    rerender(<ContempoLightbox {...defaultProps} currentIndex={0} />);
+    expect(slide()).toHaveClass('contempo-lightbox__slide--prev');
+
+    // Closing and reopening fades in instead of sliding
+    rerender(<ContempoLightbox {...defaultProps} isOpen={false} />);
+    rerender(<ContempoLightbox {...defaultProps} />);
+    expect(slide()).toHaveClass('contempo-lightbox__slide--none');
+  });
+
+  test('the image follows a horizontal drag and eases back when released', () => {
+    const { container } = render(<ContempoLightbox {...defaultProps} />);
+    const dialog = screen.getByRole('dialog');
+    const slide = container.querySelector('.contempo-lightbox__slide') as HTMLElement;
+
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 200, clientY: 200 }] });
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 205, clientY: 200 }] });
+    expect(slide.style.transform).toBe('');
+
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 170, clientY: 205 }] });
+    expect(slide.style.transform).toBe('translateX(-30px)');
+    expect(slide.style.transition).toBe('none');
+
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 170, clientY: 205 }] });
+    expect(slide.style.transform).toBe('');
+    expect(slide.style.transition).toBe('');
+    expect(defaultProps.onNext).not.toHaveBeenCalled();
+  });
+
+  test('vertical moves and cancelled touches do not drag the image', () => {
+    const { container } = render(<ContempoLightbox {...defaultProps} />);
+    const dialog = screen.getByRole('dialog');
+    const slide = container.querySelector('.contempo-lightbox__slide') as HTMLElement;
+
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 100, clientY: 100 }] });
+    expect(slide.style.transform).toBe('');
+
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 200, clientY: 200 }] });
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 180, clientY: 300 }] });
+    expect(slide.style.transform).toBe('');
+
+    fireEvent.touchMove(dialog, { touches: [{ clientX: 100, clientY: 210 }] });
+    expect(slide.style.transform).toBe('translateX(-100px)');
+    fireEvent.touchCancel(dialog);
+    expect(slide.style.transform).toBe('');
+
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 0, clientY: 200 }] });
+    expect(defaultProps.onNext).not.toHaveBeenCalled();
+  });
+
+  test('preloads the neighbouring images, except with a custom renderImage', () => {
+    const OriginalImage = window.Image;
+    const loaded: string[] = [];
+    window.Image = class { set src(value: string) { loaded.push(value); } } as unknown as typeof Image;
+    try {
+      const { rerender } = render(<ContempoLightbox {...defaultProps} />);
+      expect(loaded).toEqual([mockImages[1].src, mockImages[2].src]);
+
+      loaded.length = 0;
+      rerender(<ContempoLightbox {...defaultProps} renderImage={(image, { alt }) => <img src={image.src} alt={alt} />} />);
+      expect(loaded).toEqual([]);
+    } finally {
+      window.Image = OriginalImage;
+    }
+  });
 });
