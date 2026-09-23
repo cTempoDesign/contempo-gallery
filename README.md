@@ -91,6 +91,13 @@ function App() {
 | `onImageClick` | `(index: number, image: ContempoGalleryImage) => void` | - | Callback when an image is clicked |
 | `showLightbox` | `boolean` | `true` | Whether to show the lightbox on image click |
 | `lightboxClassName` | `string` | `''` | Additional CSS class for the lightbox |
+| `aspectRatio` | `string` | `'1'` | CSS aspect ratio for grid tiles, e.g. `'3 / 2'` |
+| `renderImage` | `(image, { index, variant, className, alt }) => ReactNode` | - | Replace the default `<img>` in the grid (`variant: 'grid'`) and lightbox (`variant: 'lightbox'`), e.g. with `next/image` |
+| `renderLightboxFooter` | `(image, index) => ReactNode` | - | Extra content under the active lightbox image, e.g. a buy button |
+
+Images can carry extra fields (e.g. `photoId`); the component is generic, so `renderImage`, `renderLightboxFooter` and `onImageClick` receive your full image type.
+
+The lightbox supports arrow keys, Escape, and swipe left/right on touch screens.
 
 ### ContempoGalleryImage Interface
 
@@ -121,6 +128,41 @@ function CustomGallery() {
       images={images}
       onImageClick={handleImageClick}
       showLightbox={false} // Disable built-in lightbox
+    />
+  );
+}
+```
+
+### With next/image (Next.js)
+
+Render props are functions, so they must be passed from a client component. Keep data loading in the server component and wrap the gallery in a small client component:
+
+```tsx
+'use client';
+import Image from 'next/image';
+import { ContempoGallery } from '@ctempodesign/contempo-gallery';
+
+type Photo = { src: string; alt: string; blurDataURL: string; photoId: string };
+
+export default function PhotoGallery({ photos }: { photos: Photo[] }) {
+  return (
+    <ContempoGallery
+      images={photos}
+      columns={4}
+      gap={24}
+      aspectRatio="3 / 2"
+      renderImage={(photo, { variant, className, alt, index }) =>
+        variant === 'grid' ? (
+          <Image src={photo.src} alt={alt} className={className} fill
+            sizes="(max-width: 768px) 100vw, 25vw" priority={index < 4}
+            placeholder="blur" blurDataURL={photo.blurDataURL} />
+        ) : (
+          <div style={{ position: 'relative', width: '90vw', height: '75vh' }}>
+            <Image src={photo.src} alt={alt} fill sizes="90vw" style={{ objectFit: 'contain' }} />
+          </div>
+        )
+      }
+      renderLightboxFooter={(photo) => <a href={`/shop/${photo.photoId}`}>Buy print</a>}
     />
   );
 }

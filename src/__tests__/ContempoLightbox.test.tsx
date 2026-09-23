@@ -360,4 +360,51 @@ describe('ContempoLightbox', () => {
     render(<ContempoLightbox {...defaultProps} currentIndex={10} />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  test('swipe left goes to next image, swipe right to previous', () => {
+    render(<ContempoLightbox {...defaultProps} />);
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 300 }] });
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 100 }] });
+    expect(defaultProps.onNext).toHaveBeenCalledTimes(1);
+
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 300 }] });
+    expect(defaultProps.onPrev).toHaveBeenCalledTimes(1);
+  });
+
+  test('short touches and single images do not navigate', () => {
+    const { rerender } = render(<ContempoLightbox {...defaultProps} />);
+    const dialog = screen.getByRole('dialog');
+
+    fireEvent.touchStart(dialog, { touches: [{ clientX: 100 }] });
+    fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 120 }] });
+
+    rerender(<ContempoLightbox {...defaultProps} images={[mockImages[0]]} />);
+    fireEvent.touchStart(screen.getByRole('dialog'), { touches: [{ clientX: 300 }] });
+    fireEvent.touchEnd(screen.getByRole('dialog'), { changedTouches: [{ clientX: 100 }] });
+
+    expect(defaultProps.onNext).not.toHaveBeenCalled();
+    expect(defaultProps.onPrev).not.toHaveBeenCalled();
+  });
+
+  test('arrow keys inside footer form fields do not navigate', () => {
+    render(
+      <ContempoLightbox
+        {...defaultProps}
+        renderLightboxFooter={() => (
+          <select aria-label="Size"><option>Small</option><option>Large</option></select>
+        )}
+      />
+    );
+    const select = screen.getByLabelText('Size');
+    fireEvent.keyDown(select, { key: 'ArrowRight' });
+    fireEvent.keyDown(select, { key: 'ArrowLeft' });
+    expect(defaultProps.onNext).not.toHaveBeenCalled();
+    expect(defaultProps.onPrev).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(select, { key: 'Escape' });
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+  });
 });

@@ -1,3 +1,9 @@
 export { ContempoGallery } from './ContempoGallery';
 export { ContempoLightbox } from './ContempoLightbox';
-export type { ContempoGalleryProps, ContempoGalleryImage, ContempoLightboxProps } from './types';
+export type {
+  ContempoGalleryProps,
+  ContempoGalleryImage,
+  ContempoLightboxProps,
+  ContempoImageVariant,
+  ContempoRenderImageContext
+} from './types';

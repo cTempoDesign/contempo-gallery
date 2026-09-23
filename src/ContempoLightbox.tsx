@@ -1,21 +1,29 @@
 import React, { useEffect, useCallback, useRef } from 'react';
-import { ContempoLightboxProps } from './types';
+import { ContempoGalleryImage, ContempoLightboxProps } from './types';
 import './ContempoLightbox.css';
 
-export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
+// Minimum horizontal travel (px) for a touch gesture to count as a swipe
+const SWIPE_THRESHOLD = 50;
+
+export function ContempoLightbox<T extends ContempoGalleryImage>({
   images,
   currentIndex,
   isOpen,
   onClose,
   onNext,
   onPrev,
-  className = ''
-}) => {
+  className = '',
+  renderImage,
+  renderLightboxFooter
+}: ContempoLightboxProps<T>) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
+    // Leave arrow keys to form fields rendered in the footer (e.g. a size <select>)
+    const target = e.target as HTMLElement | null;
+    if (e.key !== 'Escape' && target?.closest?.('input, select, textarea')) return;
 
     switch (e.key) {
       case 'Escape':
@@ -60,8 +68,22 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
     };
   }, [isOpen]);
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || images.length < 2) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (deltaX > SWIPE_THRESHOLD) onPrev();
+    else if (deltaX < -SWIPE_THRESHOLD) onNext();
+  };
+
   const currentImage = images[currentIndex];
   if (!isOpen || !currentImage) return null;
+
+  const alt = currentImage.alt || `Gallery image ${currentIndex + 1}`;
 
   return (
     <div
@@ -72,6 +94,8 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
       aria-modal="true"
       aria-label="Image lightbox"
       tabIndex={-1}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="contempo-lightbox__content">
         <button
@@ -99,15 +123,26 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
         )}
 
         <div className="contempo-lightbox__image-container">
-          <img
-            ref={imageRef}
-            src={currentImage.src}
-            alt={currentImage.alt || `Gallery image ${currentIndex + 1}`}
-            className="contempo-lightbox__image"
-          />
+          {renderImage ? (
+            renderImage(currentImage, { index: currentIndex, variant: 'lightbox', className: 'contempo-lightbox__image', alt })
+          ) : (
+            <img
+              src={currentImage.src}
+              alt={alt}
+              className="contempo-lightbox__image"
+            />
+          )}
           {currentImage.caption && (
             <div className="contempo-lightbox__caption">
               {currentImage.caption}
+            </div>
+          )}
+          <div className="contempo-lightbox__counter" aria-live="polite">
+            {currentIndex + 1} of {images.length}
+          </div>
+          {renderLightboxFooter && (
+            <div className="contempo-lightbox__footer">
+              {renderLightboxFooter(currentImage, currentIndex)}
             </div>
           )}
         </div>
@@ -125,10 +160,7 @@ export const ContempoLightbox: React.FC<ContempoLightboxProps> = ({
           </button>
         )}
 
-        <div className="contempo-lightbox__counter" aria-live="polite">
-          {currentIndex + 1} of {images.length}
-        </div>
       </div>
     </div>
   );
-};
+}

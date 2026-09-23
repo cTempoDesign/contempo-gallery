@@ -292,4 +292,40 @@ describe('ContempoGallery', () => {
       expect(lightboxImage).toHaveAttribute('src', 'https://example.com/image1.jpg');
     });
   });
+
+  test('applies a custom aspect ratio to grid tiles', () => {
+    render(<ContempoGallery images={mockImages} aspectRatio="3 / 2" />);
+    expect(screen.getByRole('grid')).toHaveStyle('--gallery-aspect-ratio: 3 / 2');
+  });
+
+  test('uses renderImage for grid tiles and the lightbox', async () => {
+    const user = userEvent.setup();
+    const renderImage = jest.fn((image, { variant, className, alt }) => (
+      <img data-testid={`custom-${variant}`} src={image.src} alt={alt} className={className} />
+    ));
+    render(<ContempoGallery images={mockImages} renderImage={renderImage} />);
+
+    expect(screen.getAllByTestId('custom-grid')).toHaveLength(mockImages.length);
+    expect(screen.getAllByTestId('custom-grid')[0]).toHaveClass('contempo-gallery__image');
+
+    await user.click(screen.getAllByRole('gridcell')[1]);
+    const lightboxImage = screen.getByTestId('custom-lightbox');
+    expect(lightboxImage).toHaveAttribute('src', mockImages[1].src);
+    expect(lightboxImage).toHaveClass('contempo-lightbox__image');
+  });
+
+  test('renders lightbox footer for the active image with custom fields', async () => {
+    const user = userEvent.setup();
+    const images = mockImages.map((img, i) => ({ ...img, photoId: `photo-${i}` }));
+    render(
+      <ContempoGallery
+        images={images}
+        renderLightboxFooter={(image) => <button type="button">Buy {image.photoId}</button>}
+      />
+    );
+
+    expect(screen.queryByText(/Buy photo/)).not.toBeInTheDocument();
+    await user.click(screen.getAllByRole('gridcell')[2]);
+    expect(screen.getByRole('button', { name: 'Buy photo-2' })).toBeInTheDocument();
+  });
 });
