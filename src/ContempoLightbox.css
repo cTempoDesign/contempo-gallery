@@ -106,7 +106,7 @@
 
 .contempo-lightbox__image {
   max-width: 100%;
-  max-height: calc(95vh - 80px);
+  max-height: calc(95vh - 120px);
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -120,6 +120,12 @@
   display: block;
 }
 
+.contempo-lightbox__footer {
+  margin-top: 16px;
+  color: white;
+  text-align: center;
+}
+
 .contempo-lightbox__caption {
   color: white;
   text-align: center;
@@ -131,10 +137,7 @@
 }
 
 .contempo-lightbox__counter {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 12px;
   color: white;
   background: rgba(0, 0, 0, 0.7);
   padding: 8px 16px;
@@ -176,7 +179,6 @@
   }
   
   .contempo-lightbox__counter {
-    bottom: 15px;
     font-size: 13px;
     padding: 6px 12px;
   }
@@ -219,7 +221,6 @@
   }
   
   .contempo-lightbox__counter {
-    bottom: 10px;
     font-size: 12px;
     padding: 5px 10px;
   }

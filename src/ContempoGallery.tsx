@@ -1,17 +1,20 @@
 import React, { useState, useCallback } from 'react';
-import { ContempoGalleryProps } from './types';
+import { ContempoGalleryImage, ContempoGalleryProps } from './types';
 import { ContempoLightbox } from './ContempoLightbox';
 import './ContempoGallery.css';
 
-export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
+export function ContempoGallery<T extends ContempoGalleryImage>({
   images,
   columns = 3,
   gap = 8,
+  aspectRatio,
   className = '',
   onImageClick,
   showLightbox = true,
-  lightboxClassName = ''
-}) => {
+  lightboxClassName = '',
+  renderImage,
+  renderLightboxFooter
+}: ContempoGalleryProps<T>) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -40,7 +43,8 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
 
   const gridStyle = {
     '--gallery-columns': columns,
-    '--gallery-gap': `${gap}px`
+    '--gallery-gap': `${gap}px`,
+    ...(aspectRatio && { '--gallery-aspect-ratio': aspectRatio })
   } as React.CSSProperties;
 
   return (
@@ -51,7 +55,9 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
         role="grid"
         aria-label="Image gallery"
       >
-        {images.map((image, index) => (
+        {images.map((image, index) => {
+          const alt = image.alt || `Gallery image ${index + 1}`;
+          return (
           <div
             key={index}
             className="contempo-gallery__item"
@@ -66,19 +72,24 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
             tabIndex={0}
             aria-label={`Image ${index + 1} of ${images.length}${image.alt ? `: ${image.alt}` : ''}`}
           >
-            <img
-              src={image.thumbnail || image.src}
-              alt={image.alt || `Gallery image ${index + 1}`}
-              className="contempo-gallery__image"
-              loading="lazy"
-            />
+            {renderImage ? (
+              renderImage(image, { index, variant: 'grid', className: 'contempo-gallery__image', alt })
+            ) : (
+              <img
+                src={image.thumbnail || image.src}
+                alt={alt}
+                className="contempo-gallery__image"
+                loading="lazy"
+              />
+            )}
             {image.caption && (
               <div className="contempo-gallery__caption">
                 {image.caption}
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {showLightbox && (
@@ -90,8 +101,10 @@ export const ContempoGallery: React.FC<ContempoGalleryProps> = ({
           onNext={handleNext}
           onPrev={handlePrev}
           className={lightboxClassName}
+          renderImage={renderImage}
+          renderLightboxFooter={renderLightboxFooter}
         />
       )}
     </>
   );
-};
+}
