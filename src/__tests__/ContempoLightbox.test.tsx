@@ -138,6 +138,22 @@ describe('ContempoLightbox', () => {
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 
+  test('empty space around the image closes, but the caption, counter and footer do not', () => {
+    const { container } = render(
+      <ContempoLightbox {...defaultProps} renderLightboxFooter={() => <span>Footer</span>} />
+    );
+
+    fireEvent.click(screen.getByText('First test image'));
+    fireEvent.click(screen.getByText('1 of 3'));
+    fireEvent.click(screen.getByText('Footer'));
+    expect(defaultProps.onClose).not.toHaveBeenCalled();
+
+    for (const cls of ['content', 'image-container', 'slide']) {
+      fireEvent.click(container.querySelector(`.contempo-lightbox__${cls}`)!);
+    }
+    expect(defaultProps.onClose).toHaveBeenCalledTimes(3);
+  });
+
   test('shows navigation buttons when there are multiple images', () => {
     render(<ContempoLightbox {...defaultProps} />);
     

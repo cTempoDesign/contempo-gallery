@@ -58,8 +58,9 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
     }
   }, [isOpen, onClose, goNext, goPrev]);
 
+  // The layout wrappers fill the screen, so a click on any of them (not on the image or controls) is a backdrop click
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    if ((e.target as HTMLElement).hasAttribute('data-contempo-backdrop')) {
       onClose();
     }
   }, [onClose]);
@@ -153,13 +154,14 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
+      data-contempo-backdrop=""
       tabIndex={-1}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={resetDrag}
     >
-      <div className="contempo-lightbox__content">
+      <div className="contempo-lightbox__content" data-contempo-backdrop="">
         <button
           className="contempo-lightbox__close"
           onClick={onClose}
@@ -184,12 +186,13 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
           </button>
         )}
 
-        <div className="contempo-lightbox__image-container">
+        <div className="contempo-lightbox__image-container" data-contempo-backdrop="">
           {/* Keyed by index so each image mounts fresh and plays its slide-in animation */}
           <div
             key={currentIndex}
             ref={slideRef}
             className={`contempo-lightbox__slide contempo-lightbox__slide--${direction}`}
+            data-contempo-backdrop=""
           >
             {renderImage ? (
               renderImage(currentImage, { index: currentIndex, variant: 'lightbox', className: 'contempo-lightbox__image', alt })

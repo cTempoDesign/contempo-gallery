@@ -92,6 +92,14 @@ Images can carry extra fields (e.g. `photoId`); the component is generic, so `re
 
 The lightbox supports arrow keys, Escape, and swipe left/right on touch screens. Images slide in from the direction you navigate, follow your finger while swiping, and the neighbouring images are preloaded so the next one is ready before you get there (skipped when you pass `renderImage`, which may load its own URLs).
 
+The lightbox scales each image to the screen it's on, including phones in landscape, where the caption and counter float over the image to leave it the full height. On phones with a notch, add `viewport-fit=cover` to your page's viewport so the lightbox covers the whole screen (its controls stay clear of the notch):
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+```
+
+In Next.js (App Router): `export const viewport = { viewportFit: 'cover' };` in your root layout.
+
 ### ContempoGalleryImage Interface
 
 ```tsx
