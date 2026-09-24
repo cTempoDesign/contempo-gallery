@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.25s ease, visibility 0.25s;
 }
 
 .contempo-lightbox__close:hover {
@@ -78,7 +78,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.25s ease, visibility 0.25s;
   z-index: 10;
 }
 
@@ -272,6 +272,34 @@
   }
 }
 
+/* Tapping the image fades the controls out; visibility also takes them out of the tab order */
+.contempo-lightbox__close,
+.contempo-lightbox__nav,
+.contempo-lightbox__caption,
+.contempo-lightbox__counter,
+.contempo-lightbox__footer {
+  visibility: visible;
+}
+
+.contempo-lightbox__caption,
+.contempo-lightbox__counter,
+.contempo-lightbox__footer {
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+
+.contempo-lightbox__image {
+  cursor: pointer;
+}
+
+.contempo-lightbox--controls-hidden .contempo-lightbox__close,
+.contempo-lightbox--controls-hidden .contempo-lightbox__nav,
+.contempo-lightbox--controls-hidden .contempo-lightbox__caption,
+.contempo-lightbox--controls-hidden .contempo-lightbox__counter,
+.contempo-lightbox--controls-hidden .contempo-lightbox__footer {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Short screens (phones in landscape): float the caption and counter over the image to give it the height */
 @media (max-height: 500px) {
   .contempo-lightbox__content {
@@ -322,7 +350,10 @@
   }
   
   .contempo-lightbox__close,
-  .contempo-lightbox__nav {
+  .contempo-lightbox__nav,
+  .contempo-lightbox__caption,
+  .contempo-lightbox__counter,
+  .contempo-lightbox__footer {
     transition: none;
   }
   

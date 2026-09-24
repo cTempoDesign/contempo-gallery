@@ -26,6 +26,8 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
   const dragging = useRef(false);
   // Which side the next image slides in from
   const [direction, setDirection] = useState<SlideDirection>('none');
+  // Tapping the image hides the buttons, counter, caption and footer for an unobstructed view
+  const [controlsHidden, setControlsHidden] = useState(false);
 
   const goNext = useCallback(() => {
     setDirection('next');
@@ -44,6 +46,10 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
     if (e.key !== 'Escape' && target?.closest?.('input, select, textarea')) return;
 
     switch (e.key) {
+      case 'Tab':
+        // Keyboard users need the buttons they are tabbing to
+        setControlsHidden(false);
+        break;
       case 'Escape':
         onClose();
         break;
@@ -60,8 +66,11 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
 
   // The layout wrappers fill the screen, so a click on any of them (not on the image or controls) is a backdrop click
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).hasAttribute('data-contempo-backdrop')) {
+    const target = e.target as HTMLElement;
+    if (target.hasAttribute('data-contempo-backdrop')) {
       onClose();
+    } else if (target.closest('.contempo-lightbox__image')) {
+      setControlsHidden((hidden) => !hidden);
     }
   }, [onClose]);
 
@@ -141,6 +150,7 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
   if (!isOpen || !currentImage) {
     // Reopening fades in rather than sliding from the last direction
     if (direction !== 'none') setDirection('none');
+    if (controlsHidden) setControlsHidden(false);
     return null;
   }
 
@@ -149,7 +159,7 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
   return (
     <div
       ref={modalRef}
-      className={`contempo-lightbox ${className}`.trim()}
+      className={`contempo-lightbox ${controlsHidden ? 'contempo-lightbox--controls-hidden' : ''} ${className}`.replace(/\s+/g, ' ').trim()}
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"

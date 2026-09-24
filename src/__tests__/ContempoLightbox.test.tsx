@@ -497,4 +497,46 @@ describe('ContempoLightbox', () => {
       window.Image = OriginalImage;
     }
   });
+  test('tapping the image hides and shows the controls', () => {
+    render(<ContempoLightbox {...defaultProps} />);
+    const dialog = screen.getByRole('dialog');
+    const image = screen.getByAltText('Test image 1');
+
+    fireEvent.click(image);
+    expect(dialog).toHaveClass('contempo-lightbox--controls-hidden');
+    expect(defaultProps.onClose).not.toHaveBeenCalled();
+
+    // Stays hidden while navigating
+    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    expect(defaultProps.onNext).toHaveBeenCalledTimes(1);
+    expect(dialog).toHaveClass('contempo-lightbox--controls-hidden');
+
+    fireEvent.click(image);
+    expect(dialog).not.toHaveClass('contempo-lightbox--controls-hidden');
+  });
+
+  test('Tab and reopening bring the controls back', () => {
+    const { rerender } = render(<ContempoLightbox {...defaultProps} />);
+    const dialog = () => screen.getByRole('dialog');
+
+    fireEvent.click(screen.getByAltText('Test image 1'));
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(dialog()).not.toHaveClass('contempo-lightbox--controls-hidden');
+
+    fireEvent.click(screen.getByAltText('Test image 1'));
+    rerender(<ContempoLightbox {...defaultProps} isOpen={false} />);
+    rerender(<ContempoLightbox {...defaultProps} />);
+    expect(dialog()).not.toHaveClass('contempo-lightbox--controls-hidden');
+  });
+
+  test('tapping a custom renderImage element toggles the controls too', () => {
+    render(
+      <ContempoLightbox
+        {...defaultProps}
+        renderImage={(image, { className, alt }) => <picture><img src={image.src} alt={alt} className={className} /></picture>}
+      />
+    );
+    fireEvent.click(screen.getByAltText('Test image 1'));
+    expect(screen.getByRole('dialog')).toHaveClass('contempo-lightbox--controls-hidden');
+  });
 });

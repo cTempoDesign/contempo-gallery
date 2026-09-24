@@ -92,6 +92,8 @@ Images can carry extra fields (e.g. `photoId`); the component is generic, so `re
 
 The lightbox supports arrow keys, Escape, and swipe left/right on touch screens. Images slide in from the direction you navigate, follow your finger while swiping, and the neighbouring images are preloaded so the next one is ready before you get there (skipped when you pass `renderImage`, which may load its own URLs).
 
+Tap or click the image to hide the arrows, close button, counter, caption and footer for an unobstructed view; tap it again (or press Tab) to bring them back. Clicking the empty space around the image closes the lightbox.
+
 The lightbox scales each image to the screen it's on, including phones in landscape, where the caption and counter float over the image to leave it the full height. On phones with a notch, add `viewport-fit=cover` to your page's viewport so the lightbox covers the whole screen (its controls stay clear of the notch):
 
 ```html
