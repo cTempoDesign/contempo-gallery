@@ -1,9 +1,13 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { ContempoGalleryImage, ContempoLightboxProps } from './types';
 import './ContempoLightbox.css';
 
 // Minimum horizontal travel (px) for a touch gesture to count as a swipe
 const SWIPE_THRESHOLD = 50;
+// Horizontal travel (px) before a touch starts dragging the image, so taps and vertical scrolls don't
+const DRAG_START = 10;
+
+type SlideDirection = 'next' | 'prev' | 'none';
 
 export function ContempoLightbox<T extends ContempoGalleryImage>({
   images,
@@ -17,7 +21,21 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
   renderLightboxFooter
 }: ContempoLightboxProps<T>) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const touchStartX = useRef<number | null>(null);
+  const slideRef = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const dragging = useRef(false);
+  // Which side the next image slides in from
+  const [direction, setDirection] = useState<SlideDirection>('none');
+
+  const goNext = useCallback(() => {
+    setDirection('next');
+    onNext();
+  }, [onNext]);
+
+  const goPrev = useCallback(() => {
+    setDirection('prev');
+    onPrev();
+  }, [onPrev]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
@@ -31,14 +49,14 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
         break;
       case 'ArrowLeft':
         e.preventDefault();
-        onPrev();
+        goPrev();
         break;
       case 'ArrowRight':
         e.preventDefault();
-        onNext();
+        goNext();
         break;
     }
-  }, [isOpen, onClose, onNext, onPrev]);
+  }, [isOpen, onClose, goNext, goPrev]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -68,20 +86,62 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
     };
   }, [isOpen]);
 
+  // Warm the browser cache for the neighbouring images so navigating never shows a blank frame.
+  // Skipped with renderImage, which may load a different URL (e.g. next/image).
+  useEffect(() => {
+    if (!isOpen || renderImage || images.length < 2) return;
+    const count = images.length;
+    for (const i of [currentIndex + 1, currentIndex - 1 + count]) {
+      const image = images[i % count];
+      if (image) new Image().src = image.src;
+    }
+  }, [isOpen, renderImage, images, currentIndex]);
+
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    dragging.current = false;
+  };
+
+  // The image follows the finger; styles are set directly to avoid a re-render per frame
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const start = touchStart.current;
+    const slide = slideRef.current;
+    if (!start || !slide || images.length < 2) return;
+    const deltaX = e.touches[0].clientX - start.x;
+    if (!dragging.current) {
+      if (Math.abs(deltaX) < DRAG_START || Math.abs(deltaX) < Math.abs(e.touches[0].clientY - start.y)) return;
+      dragging.current = true;
+      slide.style.transition = 'none';
+    }
+    slide.style.transform = `translateX(${deltaX}px)`;
+  };
+
+  // Release the drag: the image eases back unless the swipe navigates away
+  const resetDrag = () => {
+    touchStart.current = null;
+    dragging.current = false;
+    const slide = slideRef.current;
+    if (slide) {
+      slide.style.transition = '';
+      slide.style.transform = '';
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || images.length < 2) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    if (deltaX > SWIPE_THRESHOLD) onPrev();
-    else if (deltaX < -SWIPE_THRESHOLD) onNext();
+    const start = touchStart.current;
+    resetDrag();
+    if (!start || images.length < 2) return;
+    const deltaX = e.changedTouches[0].clientX - start.x;
+    if (deltaX > SWIPE_THRESHOLD) goPrev();
+    else if (deltaX < -SWIPE_THRESHOLD) goNext();
   };
 
   const currentImage = images[currentIndex];
-  if (!isOpen || !currentImage) return null;
+  if (!isOpen || !currentImage) {
+    // Reopening fades in rather than sliding from the last direction
+    if (direction !== 'none') setDirection('none');
+    return null;
+  }
 
   const alt = currentImage.alt || `Gallery image ${currentIndex + 1}`;
 
@@ -95,7 +155,9 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
       aria-label="Image lightbox"
       tabIndex={-1}
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={resetDrag}
     >
       <div className="contempo-lightbox__content">
         <button
@@ -112,7 +174,7 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
         {images.length > 1 && (
           <button
             className="contempo-lightbox__nav contempo-lightbox__nav--prev"
-            onClick={onPrev}
+            onClick={goPrev}
             aria-label="Previous image"
             type="button"
           >
@@ -123,20 +185,27 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
         )}
 
         <div className="contempo-lightbox__image-container">
-          {renderImage ? (
-            renderImage(currentImage, { index: currentIndex, variant: 'lightbox', className: 'contempo-lightbox__image', alt })
-          ) : (
-            <img
-              src={currentImage.src}
-              alt={alt}
-              className="contempo-lightbox__image"
-            />
-          )}
-          {currentImage.caption && (
-            <div className="contempo-lightbox__caption">
-              {currentImage.caption}
-            </div>
-          )}
+          {/* Keyed by index so each image mounts fresh and plays its slide-in animation */}
+          <div
+            key={currentIndex}
+            ref={slideRef}
+            className={`contempo-lightbox__slide contempo-lightbox__slide--${direction}`}
+          >
+            {renderImage ? (
+              renderImage(currentImage, { index: currentIndex, variant: 'lightbox', className: 'contempo-lightbox__image', alt })
+            ) : (
+              <img
+                src={currentImage.src}
+                alt={alt}
+                className="contempo-lightbox__image"
+              />
+            )}
+            {currentImage.caption && (
+              <div className="contempo-lightbox__caption">
+                {currentImage.caption}
+              </div>
+            )}
+          </div>
           <div className="contempo-lightbox__counter" aria-live="polite">
             {currentIndex + 1} of {images.length}
           </div>
@@ -150,7 +219,7 @@ export function ContempoLightbox<T extends ContempoGalleryImage>({
         {images.length > 1 && (
           <button
             className="contempo-lightbox__nav contempo-lightbox__nav--next"
-            onClick={onNext}
+            onClick={goNext}
             aria-label="Next image"
             type="button"
           >

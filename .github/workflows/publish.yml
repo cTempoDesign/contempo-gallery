@@ -10,6 +10,10 @@ permissions:
   contents: read
   id-token: write # npm trusted publishing (OIDC): no npm token stored anywhere
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false # never cancel a publish half-way
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -26,15 +30,20 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      # On master, publish to npmjs.com only when package.json has a version not yet published
-      - name: Publish if version is new
+      # On master, every push publishes to npmjs.com. If package.json's version is newer than
+      # the latest on npm it is used as-is (for minor/major bumps); otherwise the next patch
+      # after the latest published version is used.
+      - name: Publish to npm
         if: github.event_name == 'push'
         run: |
           NAME=$(node -p "require('./package.json').name")
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
-            echo "$NAME@$VERSION already published; bump the version in package.json to release."
-          else
-            npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
-            npm publish
+          LOCAL=$(node -p "require('./package.json').version")
+          LATEST=$(npm view "$NAME" version 2>/dev/null || echo 0.0.0)
+          NEWEST=$(printf '%s\n%s\n' "$LATEST" "$LOCAL" | sort -V | tail -n1)
+          if [ "$LOCAL" = "$LATEST" ] || [ "$NEWEST" != "$LOCAL" ]; then
+            npm version "$LATEST" --no-git-tag-version --allow-same-version
+            npm version patch --no-git-tag-version
           fi
+          echo "Publishing $NAME@$(node -p "require('./package.json').version") (latest on npm: $LATEST)"
+          npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
+          npm publish
