@@ -2,6 +2,8 @@
 
 A dynamic responsive React image gallery component with lightbox functionality, built with TypeScript and designed for accessibility.
 
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/contempowebdesign)
+
 ## 🌟 [Live Demo](https://contempo-gallery-showcase.vercel.app/)
 
 See the gallery in action with multiple configurations and examples.
@@ -361,6 +363,10 @@ Fully typed with TypeScript. All props and interfaces are exported:
 ```tsx
 import { ContempoGallery, ContempoGalleryProps, ContempoGalleryImage } from '@contempo/react-photo-gallery';
 ```
+
+## Support
+
+If this gallery saves you time, you can [buy me a coffee](https://buymeacoffee.com/contempowebdesign). ☕
 
 ## License
 
