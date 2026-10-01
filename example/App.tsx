@@ -96,6 +96,12 @@ export default function App() {
           }}
         />
       </section>
+
+      <footer style={{ marginTop: '40px', textAlign: 'center' }}>
+        <a href="https://buymeacoffee.com/contempowebdesign" target="_blank" rel="noopener noreferrer">
+          ☕ Buy me a coffee
+        </a>
+      </footer>
     </div>
   );
 }
